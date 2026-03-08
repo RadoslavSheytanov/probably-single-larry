@@ -1,35 +1,35 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { AnimatePresence } from 'framer-motion';
+import { useStore } from './state/store';
+import Home from './screens/Home';
+import StealthInput from './screens/StealthInput';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+// Placeholder for screens not yet implemented
+function ComingSoon({ label }: { label: string }) {
+  const setScreen = useStore((s) => s.setScreen);
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="fixed inset-0 bg-[#0a0a0a] flex flex-col items-center justify-center gap-6">
+      <p className="text-white/30 text-sm tracking-widest uppercase">{label}</p>
+      <button
+        className="text-white/20 text-xs tracking-widest uppercase border border-white/10 px-6 py-3 rounded-xl"
+        onClick={() => setScreen('home')}
+      >
+        Back
+      </button>
+    </div>
+  );
 }
 
-export default App
+export default function App() {
+  const screen = useStore((s) => s.screen);
+
+  return (
+    <AnimatePresence mode="wait">
+      {screen === 'home' && <Home key="home" />}
+      {screen === 'stealth' && <StealthInput key="stealth" />}
+      {screen === 'result' && <ComingSoon key="result" label="Result — Phase 3" />}
+      {screen === 'settings' && <ComingSoon key="settings" label="Settings — Phase 4" />}
+      {screen === 'history' && <ComingSoon key="history" label="History — Phase 4" />}
+      {screen === 'practice' && <ComingSoon key="practice" label="Practice Mode — Phase 4" />}
+    </AnimatePresence>
+  );
+}

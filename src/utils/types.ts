@@ -1,6 +1,6 @@
-export type Phase = 'ANCHOR' | 'DIFFERENCE' | 'COMPUTED';
+export type Phase = 'ANCHOR' | 'DIFFERENCE' | 'COMPUTED' | 'RESOLVING';
 
-export type Screen = 'calculator' | 'stealth' | 'result' | 'settings' | 'history' | 'practice';
+export type Screen = 'home' | 'stealth' | 'result' | 'settings' | 'history' | 'practice';
 
 export type InputMethod = 'touch' | 'voice' | 'both';
 
