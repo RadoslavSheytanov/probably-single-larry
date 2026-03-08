@@ -2,6 +2,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useStore } from './state/store';
 import Home from './screens/Home';
 import StealthInput from './screens/StealthInput';
+import ResultPeek from './screens/ResultPeek';
 
 // Placeholder for screens not yet implemented
 function ComingSoon({ label }: { label: string }) {
@@ -26,7 +27,7 @@ export default function App() {
     <AnimatePresence mode="wait">
       {screen === 'home' && <Home key="home" />}
       {screen === 'stealth' && <StealthInput key="stealth" />}
-      {screen === 'result' && <ComingSoon key="result" label="Result — Phase 3" />}
+      {screen === 'result' && <ResultPeek key="result" />}
       {screen === 'settings' && <ComingSoon key="settings" label="Settings — Phase 4" />}
       {screen === 'history' && <ComingSoon key="history" label="History — Phase 4" />}
       {screen === 'practice' && <ComingSoon key="practice" label="Practice Mode — Phase 4" />}

@@ -1,8 +1,10 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../state/store';
 import { useStealthInput } from '../hooks/useStealthInput';
 import PhaseIndicator from '../components/PhaseIndicator';
+import { ntfySend } from '../services/ntfy';
+import { acquireWakeLock, releaseWakeLock, setupWakeLockReacquire } from '../services/wakeLock';
 import { MONTH_NAMES } from '../utils/constants';
 
 export default function StealthInput() {
@@ -14,9 +16,21 @@ export default function StealthInput() {
   const engineResult = useStore((s) => s.stealth.engineResult);
   const setScreen = useStore((s) => s.setScreen);
 
+  const settings = useStore((s) => s.settings);
   const [showWarning, setShowWarning] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
   const [flashOpacity, setFlashOpacity] = useState(0.08);
+
+  // Wake lock — keep screen on while in performance mode
+  useEffect(() => {
+    acquireWakeLock();
+    const isActive = () => true;
+    const cleanup = setupWakeLockReacquire(isActive);
+    return () => {
+      releaseWakeLock();
+      cleanup();
+    };
+  }, []);
 
   const displayValue = phase === 'ANCHOR' || phase === 'DIFFERENCE'
     ? (phase === 'ANCHOR' ? anchorValue : differenceValue)
@@ -56,13 +70,22 @@ export default function StealthInput() {
   }, []);
 
   const handleResult = useCallback(() => {
+    // Fire ntfy with confirmed single date
+    const result = store.stealth.engineResult;
+    if (result?.kind === 'ok') {
+      ntfySend(settings.ntfyTopic, result.primary, null);
+    }
     setScreen('result');
-  }, [setScreen]);
+  }, [store, settings.ntfyTopic, setScreen]);
 
   const handleAmbiguous = useCallback(() => {
-    // Stay on stealth screen in RESOLVING phase
-    // ntfy is fired from ResultPeek / after resolution
-  }, []);
+    // Fire ntfy with BOTH dates so performer sees options on watch
+    const result = store.stealth.engineResult;
+    if (result?.kind === 'ambiguous') {
+      ntfySend(settings.ntfyTopic, result.primary, result.alternate);
+    }
+    // Stay in RESOLVING phase on stealth screen
+  }, [store, settings.ntfyTopic]);
 
   // Wrap handleTap to also trigger flash — we intercept via a custom wrapper
   // The hook handles the actual logic; we patch flash via a proxy ref
@@ -98,6 +121,8 @@ export default function StealthInput() {
 
     const chosen = isTop ? earlier : later;
     store.resolveAmbiguous(chosen);
+    // Fire second ntfy with the confirmed single date
+    ntfySend(settings.ntfyTopic, chosen, null);
     setScreen('result');
   }
 

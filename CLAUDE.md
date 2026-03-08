@@ -124,18 +124,32 @@ singularis/
   - src/engine/starsigns.ts — complete zodiac lookup
   - src/engine/engine.test.ts — 30/30 tests passing
   - src/utils/types.ts, src/utils/constants.ts
+- Phase 2: State, home screen, stealth input, app router
+  - src/state/store.ts — full Zustand store (navigation, stealth phases, history, settings)
+  - src/screens/Home.tsx — dashboard with Start Performance, Practice, History, Settings
+  - src/screens/StealthInput.tsx — black screen, invisible zones, RESOLVING ambiguous state
+  - src/hooks/useStealthInput.ts — all gestures + keyboard shortcuts
+  - src/components/PhaseIndicator.tsx — 4-state dots
+  - src/services/haptics.ts — all 6 vibration patterns
+  - src/App.tsx — AnimatePresence screen router
+- Phase 3: Result screen, output channels
+  - src/services/ntfy.ts — push to ntfy.sh (fires twice on ambiguous)
+  - src/services/ics.ts — .ics calendar file generation + download
+  - src/services/wakeLock.ts — screen wake lock with visibility re-acquire
+  - src/components/WatchPreview.tsx — slide-in watch card, auto-dismisses after 5s
+  - src/screens/ResultPeek.tsx — animated result reveal, save to calendar, new reading
 
 ### Remaining
-- Phase 2: Zustand store, Home screen, StealthInput (performance mode), App router
-- Phase 3: ResultPeek (visual fallback), AmbiguousResolver, ntfy service, .ics service
 - Phase 4: Settings panel, History panel, PracticeMode
 - Phase 5: Voice input (Web Speech API)
-- Phase 6: PWA polish, icons, wake lock, keyboard shortcuts
+- Phase 6: PWA polish, icons, keyboard shortcuts
 - Phase 7: License gate, anti-debugging, domain lock, obfuscation
 
 ### Key Decisions Made
 - No Decoy Calculator — app has a Home dashboard instead
 - Performance mode = pure black screen, phone always in pocket
 - ntfy → watch is the primary output channel; ResultPeek is visual fallback
-- Ambiguous: ntfy fires twice (both options, then confirmed); top = earlier date, bottom = later
+- Ambiguous: ntfy fires twice (both options first, then confirmed after tap resolution)
+- Top zone tap = earlier calendar date; Bottom zone tap = later calendar date
 - Phase indicator has 4 states: ANCHOR → DIFFERENCE → COMPUTED → RESOLVING
+- Git: develop branch for all work; main kept clean for final PR merge
