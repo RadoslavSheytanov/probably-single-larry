@@ -11,6 +11,4 @@ export const LONG_PRESS_MS = 600;
 export const DOUBLE_TAP_MS = 300;
 export const ACTIVATION_WINDOW_MS = 2000;
 export const ACTIVATION_TAP_GAP_MS = 400;
-export const VOICE_TIMEOUT_MS = 30000;
-export const VOICE_SILENCE_MS = 2000;
 export const WATCH_PREVIEW_DURATION_MS = 5000;
