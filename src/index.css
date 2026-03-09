@@ -22,21 +22,34 @@
   box-sizing: border-box;
 }
 
+/*
+ * Safe-area base values — edit here to adjust all safe-area-aware classes.
+ *   min-header: floor for pt-safe-header; 56px covers notch (~44px) + 12px gap
+ *   min-nav:    floor for pb-safe-nav; 48px covers home indicator (~34px) + 14px gap
+ *   min-abs:    floor for top-safe / bottom-safe absolute elements
+ *   gap-flow:   extra gap added on top of the inset for flow-layout elements
+ *   gap-abs:    extra gap for absolutely-positioned edge elements
+ */
+:root {
+  --safe-min-header: 56px;
+  --safe-min-nav: 48px;
+  --safe-min-abs: 32px;
+  --safe-gap-flow: 16px;
+  --safe-gap-abs: 8px;
+}
+
 @layer utilities {
-  /* Safe-area-aware header padding — accounts for notch / Dynamic Island */
   .pt-safe-header {
-    padding-top: max(56px, calc(env(safe-area-inset-top, 0px) + 16px));
+    padding-top: max(var(--safe-min-header), calc(env(safe-area-inset-top, 0px) + var(--safe-gap-flow)));
   }
-  /* Safe-area-aware bottom padding — accounts for home indicator */
   .pb-safe-nav {
-    padding-bottom: max(48px, calc(env(safe-area-inset-bottom, 0px) + 16px));
+    padding-bottom: max(var(--safe-min-nav), calc(env(safe-area-inset-bottom, 0px) + var(--safe-gap-flow)));
   }
-  /* Safe-area-aware absolute positioning for elements near screen edges */
   .top-safe {
-    top: max(32px, calc(env(safe-area-inset-top, 0px) + 8px));
+    top: max(var(--safe-min-abs), calc(env(safe-area-inset-top, 0px) + var(--safe-gap-abs)));
   }
   .bottom-safe {
-    bottom: max(32px, calc(env(safe-area-inset-bottom, 0px) + 8px));
+    bottom: max(var(--safe-min-abs), calc(env(safe-area-inset-bottom, 0px) + var(--safe-gap-abs)));
   }
 }
 
