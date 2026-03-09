@@ -139,8 +139,15 @@ singularis/
   - src/components/WatchPreview.tsx — slide-in watch card, auto-dismisses after 5s
   - src/screens/ResultPeek.tsx — animated result reveal, save to calendar, new reading
 
+- Phase 4: Settings, History, PracticeMode
+  - src/screens/Settings.tsx — slide-up panel: input method, ntfy topic, toggles, activation taps, clear history, license display, version
+  - src/screens/History.tsx — slide-up panel: chronological reading list, zodiac symbol + date + sign name
+  - src/screens/PracticeMode.tsx — random date drill: show date, reveal A/D/steps/sign, edge case flags, next date
+  - src/App.tsx — all three screens wired in (ComingSoon placeholders removed)
+  - Bug fix: removed double history write (resolveAmbiguous no longer writes to history; ResultPeek handles all writes)
+  - Bug fix: phase label opacity was using broken formula; fixed to constant 0.06
+
 ### Remaining
-- Phase 4: Settings panel, History panel, PracticeMode
 - Phase 5: Voice input (Web Speech API)
 - Phase 6: PWA polish, icons, keyboard shortcuts
 - Phase 7: License gate, anti-debugging, domain lock, obfuscation

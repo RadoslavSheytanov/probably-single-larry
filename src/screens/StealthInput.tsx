@@ -154,7 +154,7 @@ export default function StealthInput() {
           </div>
           <div
             className="text-white mt-4 tracking-[6px] uppercase"
-            style={{ fontSize: 11, fontWeight: 300, opacity: 0.06 / flashOpacity * 0.06 }}
+            style={{ fontSize: 11, fontWeight: 300, opacity: 0.06 }}
           >
             {phaseLabel}
           </div>

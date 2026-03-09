@@ -66,7 +66,7 @@ const DEFAULT_STEALTH: StealthState = {
 
 export const useStore = create<AppState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       // ── Navigation ──────────────────────────────────────────────────────
       screen: 'home',
       setScreen: (screen) => set({ screen }),
@@ -137,18 +137,9 @@ export const useStore = create<AppState>()(
         })),
 
       resolveAmbiguous: (date) => {
-        set((s) => {
-          const reading: Reading = {
-            id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-            timestamp: Date.now(),
-            result: s.stealth.engineResult!,
-            resolvedDate: date,
-          };
-          return {
-            stealth: { ...s.stealth, phase: 'COMPUTED', resolvedDate: date },
-            history: [reading, ...get().history].slice(0, 100),
-          };
-        });
+        set((s) => ({
+          stealth: { ...s.stealth, phase: 'COMPUTED', resolvedDate: date },
+        }));
       },
 
       resetStealth: () =>
