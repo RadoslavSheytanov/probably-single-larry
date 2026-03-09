@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../state/store';
 import { useStealthInput } from '../hooks/useStealthInput';
@@ -92,13 +92,15 @@ export default function StealthInput() {
   const flashRef = useRef(triggerFlash);
   flashRef.current = triggerFlash;
 
-  useStealthInput(containerRef as React.RefObject<HTMLElement | null>, {
+  const stealthOpts = useMemo(() => ({
     onAnchorTooLow: handleAnchorTooLow,
     onError: handleError,
     onResult: handleResult,
     onAmbiguous: handleAmbiguous,
     onExit: handleExit,
-  });
+  }), [handleAnchorTooLow, handleError, handleResult, handleAmbiguous, handleExit]);
+
+  useStealthInput(containerRef as React.RefObject<HTMLElement | null>, stealthOpts);
 
   // Resolve ambiguous via top/bottom tap when in RESOLVING phase
   function handleResolveTap(e: React.TouchEvent | React.MouseEvent) {
