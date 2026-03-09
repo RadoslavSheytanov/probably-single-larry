@@ -23,7 +23,12 @@ Sold via Gumroad as a one-time purchase. Licensing uses a URL-token + Redis sess
 - Global npm packages required: javascript-obfuscator, serve
 - Redis required for local dev: `docker run -p 6379:6379 redis:alpine` or system redis
 
-## Commands (singularis/)
+## Git Branches
+- `develop` — all active work; working branch (YOU ARE HERE)
+- `main` — clean/stable; only merge into main for releases
+
+## Commands (root / PWA)
+Run from `probably-single-larry/`:
 - Dev: `npm run dev`
 - Build: `npm run build`
 - Build + obfuscate (prod): `npm run build:prod`
@@ -41,49 +46,48 @@ Sold via Gumroad as a one-time purchase. Licensing uses a URL-token + Redis sess
 
 ## Project Layout
 ```
-probably-single-larry/
-├── singularis/                  ← PWA source
-│   ├── CLAUDE.md                ← YOU ARE HERE
-│   ├── SPEC.md
-│   ├── package.json
-│   ├── vite.config.ts
-│   ├── tsconfig.json
-│   ├── index.html               # title="Calculator"
-│   ├── .env.production          # VITE_SERVER_URL=https://your-server.com
-│   ├── public/icons/
-│   └── src/
-│       ├── main.tsx             # Domain lock + anti-debug (PROD only)
-│       ├── App.tsx              # URL token capture → exchange → heartbeat → screens
-│       ├── index.css            # Tailwind @import + safe-area utilities
-│       ├── state/store.ts       # Zustand store
-│       ├── engine/
-│       │   ├── singularis.ts
-│       │   ├── starsigns.ts
-│       │   └── engine.test.ts   # 30/30 passing
-│       ├── screens/
-│       │   ├── LicenseGate.tsx  # Token paste/input → exchange → unlock
-│       │   ├── Home.tsx
-│       │   ├── StealthInput.tsx
-│       │   ├── ResultPeek.tsx
-│       │   ├── Settings.tsx     # onDeactivate prop → logout() → needs-auth
-│       │   ├── History.tsx
-│       │   └── PracticeMode.tsx
-│       ├── components/
-│       │   ├── WatchPreview.tsx
-│       │   └── PhaseIndicator.tsx
-│       ├── services/
-│       │   ├── license.ts       # captureURLToken, exchangeToken, heartbeat, logout
-│       │   ├── ntfy.ts
-│       │   ├── ics.ts
-│       │   ├── haptics.ts
-│       │   └── wakeLock.ts
-│       ├── hooks/
-│       │   ├── useStealthInput.ts
-│       │   └── useHeartbeat.ts  # 3-min interval, visibility-aware, NETWORK_ERROR tolerant
-│       └── utils/
-│           ├── constants.ts
-│           └── types.ts
-├── singularis-server/           ← License server (Node.js 24 + Hono)
+probably-single-larry/           ← repo root (branch: develop)
+├── CLAUDE.md                    ← YOU ARE HERE
+├── SPEC.md
+├── package.json                 # PWA
+├── vite.config.ts
+├── tsconfig.json
+├── index.html                   # title="Calculator"
+├── .env.production              # VITE_SERVER_URL=https://your-server.com
+├── public/icons/
+└── src/
+    ├── main.tsx                 # Domain lock + anti-debug (PROD only)
+    ├── App.tsx                  # URL token capture → exchange → heartbeat → screens
+    ├── index.css                # Tailwind @import + safe-area utilities
+    ├── state/store.ts           # Zustand store
+    ├── engine/
+    │   ├── singularis.ts
+    │   ├── starsigns.ts
+    │   └── engine.test.ts       # 30/30 passing
+    ├── screens/
+    │   ├── LicenseGate.tsx      # Token paste/input → exchange → unlock
+    │   ├── Home.tsx
+    │   ├── StealthInput.tsx
+    │   ├── ResultPeek.tsx
+    │   ├── Settings.tsx         # onDeactivate prop → logout() → needs-auth
+    │   ├── History.tsx
+    │   └── PracticeMode.tsx
+    ├── components/
+    │   ├── WatchPreview.tsx
+    │   └── PhaseIndicator.tsx
+    ├── services/
+    │   ├── license.ts           # captureURLToken, exchangeToken, heartbeat, logout
+    │   ├── ntfy.ts
+    │   ├── ics.ts
+    │   ├── haptics.ts
+    │   └── wakeLock.ts
+    ├── hooks/
+    │   ├── useStealthInput.ts
+    │   └── useHeartbeat.ts      # 3-min interval, visibility-aware, NETWORK_ERROR tolerant
+    └── utils/
+        ├── constants.ts
+        └── types.ts
+singularis-server/               ← License server (Node.js 24 + Hono)
 │   ├── package.json             # hono, @hono/node-server, ioredis, tsx
 │   ├── tsconfig.json
 │   ├── .env.example
@@ -103,7 +107,7 @@ probably-single-larry/
 │       └── utils/
 │           ├── crypto.ts        # sha256()
 │           └── fingerprint.ts   # IP+UA hash for audit logging
-└── singularis-worker/           ← DEPRECATED — superseded by singularis-server/
+singularis-worker/               ← DEPRECATED — superseded by singularis-server/
 ```
 
 ## License Architecture
@@ -196,7 +200,7 @@ REVOCATION (POST /webhooks/gumroad with refunded=true):
 5. Open `http://localhost:5173?t=MY-TEST-TOKEN` — should unlock
 6. Set Gumroad webhook URL to `https://your-server.com/webhooks/gumroad`
 7. Update `ALLOWED_DOMAINS` in `src/main.tsx` with production domain
-8. Create `singularis/.env.production` with `VITE_SERVER_URL=https://your-server.com`
+8. Create `.env.production` (root) with `VITE_SERVER_URL=https://your-server.com`
 9. Update Gumroad URL in `LicenseGate.tsx`
 10. Run `npm run build:prod` and deploy PWA
 11. Deploy server to Railway/Fly.io with Redis addon, persistent data volume
