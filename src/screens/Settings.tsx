@@ -53,7 +53,11 @@ function SegmentPicker<T extends string>({
   );
 }
 
-export default function Settings() {
+interface Props {
+  onDeactivate?: () => void;
+}
+
+export default function Settings({ onDeactivate }: Props) {
   const setScreen = useStore((s) => s.setScreen);
   const settings = useStore((s) => s.settings);
   const updateSettings = useStore((s) => s.updateSettings);
@@ -79,6 +83,11 @@ export default function Settings() {
   function handleClose() {
     updateSettings({ ntfyTopic: ntfyInput.trim() });
     setScreen('home');
+  }
+
+  function handleDeactivate() {
+    updateSettings({ licenseKey: '', licenseEmail: '' });
+    onDeactivate?.();
   }
 
   return (
@@ -190,7 +199,17 @@ export default function Settings() {
         <div className="py-4 border-b border-white/[0.04]">
           <p className="text-white/50 text-sm font-light mb-2">License Key</p>
           {settings.licenseKey ? (
-            <p className="text-white/25 text-xs font-mono">{settings.licenseKey}</p>
+            <>
+              <p className="text-white/25 text-xs font-mono mb-3">{settings.licenseKey}</p>
+              <button
+                className="text-xs tracking-wide font-light"
+                style={{ color: 'rgba(255,90,90,0.5)' }}
+                onTouchStart={(e) => { e.preventDefault(); handleDeactivate(); }}
+                onClick={handleDeactivate}
+              >
+                Deactivate
+              </button>
+            </>
           ) : (
             <p className="text-white/15 text-xs">Not activated</p>
           )}

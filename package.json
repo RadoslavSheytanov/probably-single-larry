@@ -1,5 +1,5 @@
 {
-  "name": "singularis-tmp",
+  "name": "singularis",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "obfuscate": "javascript-obfuscator dist/assets --output dist/assets --compact true --control-flow-flattening true --control-flow-flattening-threshold 0.5 --dead-code-injection true --dead-code-injection-threshold 0.2 --string-array true --string-array-encoding rc4 --string-array-threshold 0.75 --self-defending true --debug-protection true --rename-globals false",
+    "build:prod": "npm run build && npm run obfuscate"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
