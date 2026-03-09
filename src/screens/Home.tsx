@@ -25,7 +25,7 @@ export default function Home() {
       transition={{ duration: 0.3 }}
     >
       {/* Header */}
-      <div className="flex flex-col items-center pt-16 pb-8 px-8">
+      <div className="flex flex-col items-center pt-safe-header pb-8 px-8">
         <p className="text-[10px] tracking-[6px] uppercase text-white/20 mb-2">
           Singularis
         </p>
@@ -93,7 +93,7 @@ export default function Home() {
       </div>
 
       {/* Bottom nav */}
-      <div className="flex items-center justify-between px-10 pb-12 pt-4">
+      <div className="flex items-center justify-between px-10 pb-safe-nav pt-4">
         <motion.button
           className="flex flex-col items-center gap-1 text-white/25 active:text-white/50"
           whileTap={{ scale: 0.92 }}

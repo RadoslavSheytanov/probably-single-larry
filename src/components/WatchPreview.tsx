@@ -20,7 +20,7 @@ export default function WatchPreview({ date, visible, onDismiss }: Props) {
     <AnimatePresence>
       {visible && (
         <motion.div
-          className="absolute top-4 right-4 flex flex-col gap-1 rounded-[22px] border border-white/[0.08] overflow-hidden"
+          className="absolute top-safe right-4 flex flex-col gap-1 rounded-[22px] border border-white/[0.08] overflow-hidden"
           style={{
             width: 160,
             background: '#1c1c1e',

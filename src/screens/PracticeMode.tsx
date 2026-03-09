@@ -53,7 +53,7 @@ export default function PracticeMode() {
       transition={{ duration: 0.3 }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-6 pt-14 pb-6">
+      <div className="flex items-center justify-between px-6 pt-safe-header pb-6">
         <p
           className="uppercase tracking-[6px] text-xs"
           style={{ color: 'rgba(255,159,10,0.5)' }}
@@ -182,7 +182,7 @@ export default function PracticeMode() {
       </div>
 
       {/* Next Date */}
-      <div className="px-8 pb-12 pt-4">
+      <div className="px-8 pb-safe-nav pt-4">
         <motion.button
           className="w-full py-4 rounded-2xl border text-sm tracking-[3px] uppercase font-light"
           style={{ borderColor: 'rgba(255,159,10,0.3)', color: 'rgba(255,159,10,0.6)' }}

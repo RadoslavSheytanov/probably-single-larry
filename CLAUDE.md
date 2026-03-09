@@ -3,6 +3,8 @@
 ## Project Overview
 Singularis is a professional-grade Progressive Web App for performing mentalists. It computes a spectator's date of birth and star sign from two secretly inputted numbers. The app has a clean Home dashboard for setup/practice, and a pure-black Performance Mode screen where the performer inputs numbers blind with the phone in their pocket. Results are pushed to the performer's smartwatch via ntfy.sh. No decoy calculator — the stealth is in how the phone is used, not what it looks like.
 
+Sold via Gumroad as a one-time purchase. License key validation uses a Cloudflare Worker that calls the Gumroad License API; a signed HMAC token is stored locally for offline re-validation on subsequent launches. Targets iOS Safari PWA and Android Chrome PWA.
+
 ## Tech Stack
 - React 18 + TypeScript
 - Vite 7 (build tool, dev server, PWA plugin)
@@ -69,16 +71,21 @@ singularis/
     │   ├── ntfy.ts         # Push notification to ntfy.sh
     │   ├── ics.ts          # Calendar file generation
     │   ├── haptics.ts      # Vibration patterns
-    │   ├── speech.ts       # Web Speech API voice input
     │   ├── wakeLock.ts     # Screen wake lock
-    │   └── license.ts      # License key validation
+    │   └── license.ts      # License key validation (calls CF Worker, stores HMAC token)
     ├── hooks/
-    │   ├── useStealthInput.ts  # Touch zone + gesture logic
-    │   └── useVoiceCapture.ts  # Speech recognition hook
+    │   └── useStealthInput.ts  # Touch zone + gesture logic
     └── utils/
         ├── constants.ts
         └── types.ts
 ```
+
+## Mobile Platform Notes
+- All screens must account for iOS safe areas: `pt-[env(safe-area-inset-top)]` on headers, `pb-[env(safe-area-inset-bottom)]` on bottom bars
+- Minimum touch target: 44×44px on all interactive elements
+- Haptic calls (`navigator.vibrate`) must be wrapped in `try/catch` — iOS silently ignores but some environments throw
+- Never assume Speech API availability — it's not used (voice input was removed)
+- Test at 375px width (iPhone SE) — smallest supported viewport
 
 ## Code Standards
 - TypeScript strict mode, no `any` types
@@ -147,10 +154,20 @@ singularis/
   - Bug fix: removed double history write (resolveAmbiguous no longer writes to history; ResultPeek handles all writes)
   - Bug fix: phase label opacity was using broken formula; fixed to constant 0.06
 
+- Phase 5: PWA polish
+  - public/icons/icon-192.png, icon-512.png — calculator icons generated via ImageMagick
+  - index.html — full iOS/Android PWA meta tags, Google Fonts preconnect, noindex, title "Calculator"
+  - src/index.css — safe-area utility classes: pt-safe-header, pb-safe-nav, top-safe, bottom-safe
+  - src/utils/types.ts — removed InputMethod type, removed inputMethod from AppSettings
+  - src/state/store.ts — removed inputMethod from DEFAULT_SETTINGS
+  - src/screens/Settings.tsx — removed Input Method row; all screens updated with safe-area classes
+  - All screens (Home, StealthInput, ResultPeek, Settings, History, PracticeMode, WatchPreview) — safe-area insets applied
+  - vite.config.ts — orientation: portrait, categories, maskable icon, Google Fonts Workbox cache
+  - package.json — added typecheck script
+  - Typecheck: 0 errors
+
 ### Remaining
-- Phase 5: Voice input (Web Speech API)
-- Phase 6: PWA polish, icons, keyboard shortcuts
-- Phase 7: License gate, anti-debugging, domain lock, obfuscation
+- Phase 6: License gate — LicenseGate.tsx screen, Cloudflare Worker (separate repo/deploy), license.ts service, HMAC token storage, anti-debugging, domain lock, obfuscation
 
 ### Key Decisions Made
 - No Decoy Calculator — app has a Home dashboard instead
@@ -160,3 +177,62 @@ singularis/
 - Top zone tap = earlier calendar date; Bottom zone tap = later calendar date
 - Phase indicator has 4 states: ANCHOR → DIFFERENCE → COMPUTED → RESOLVING
 - Git: develop branch for all work; main kept clean for final PR merge
+- Voice input removed — touch-only stealth input (top zone +10, bottom zone +1)
+- Sales model: Gumroad one-time purchase → license key emailed → Cloudflare Worker validates against Gumroad API → HMAC token stored locally for offline re-validation
+- Safe-area insets implemented via four @layer utility classes (pt-safe-header, pb-safe-nav, top-safe, bottom-safe) using CSS max() — no inline styles
+
+## Session State (last updated: 2026-03-09)
+
+### Last Session Summary
+- Reviewed and amended architectural spec (CLAUDE.md + SPEC.md)
+- Removed voice input from spec and all code
+- Added mobile platform support section to SPEC.md
+- Added sales/distribution section (Gumroad) and authentication architecture (Cloudflare Worker + HMAC) to SPEC.md
+- Completed Phase 5: PWA polish
+
+### Phases Complete
+- Phase 0: Environment setup
+- Phase 1: Engine (singularis.ts, starsigns.ts, 30/30 tests)
+- Phase 2: State + core screens (store, Home, StealthInput, hooks, haptics)
+- Phase 3: Output channels (ntfy, ics, wake lock, WatchPreview, ResultPeek)
+- Phase 4: Settings, History, PracticeMode panels
+- Phase 5: PWA polish (icons, meta tags, safe-area, manifest, typecheck)
+
+### Phase In Progress
+- **Phase 6** — not yet started
+- Next step: build `src/screens/LicenseGate.tsx` (email + key input, activate button, spinner, error state)
+- Then: `src/services/license.ts` (POST to CF Worker, store HMAC token, local verify on launch)
+- Then: Wire LicenseGate into App.tsx (gate before home if no valid local token)
+- Then: Build + deploy Cloudflare Worker (separate project, calls Gumroad License API)
+- Then: Anti-debugging setInterval timing check + domain lock (prod build only)
+- Then: Post-build javascript-obfuscator step
+
+### Open Bugs / TODOs
+- None currently known
+
+### Design Decisions Differing from SPEC.md
+- SPEC.md §2.1 describes a Decoy Calculator screen — this was dropped in favour of a Singularis Home dashboard (decision made in Phase 2, intentional)
+- SPEC.md §2.2 included voice input — removed this session (unreliable, touch-only is correct approach)
+- Settings.tsx no longer has "Input Method" row (voice removed)
+- History storage is currently plain Zustand persist (localStorage via zustand/middleware) — SPEC.md mentions optional AES-256 encryption via Web Crypto API; this has NOT been implemented and is deferred/optional
+
+### Store Shape (AppSettings)
+```ts
+interface AppSettings {
+  ntfyTopic: string;
+  autoSaveCalendar: boolean;
+  watchPeekPreview: boolean;
+  hapticFeedback: boolean;
+  activationTaps: 3 | 5 | 7;
+  licenseKey: string;
+  licenseEmail: string;
+}
+```
+
+### Safe-Area Utility Classes (src/index.css)
+```css
+.pt-safe-header  → max(56px, safe-area-inset-top + 16px)
+.pb-safe-nav     → max(48px, safe-area-inset-bottom + 16px)
+.top-safe        → max(32px, safe-area-inset-top + 8px)
+.bottom-safe     → max(32px, safe-area-inset-bottom + 8px)
+```

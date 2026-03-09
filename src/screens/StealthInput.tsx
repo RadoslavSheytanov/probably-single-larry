@@ -206,13 +206,13 @@ export default function StealthInput() {
       )}
 
       {/* Phase indicator dots */}
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+      <div className="absolute bottom-safe left-0 right-0 flex justify-center">
         <PhaseIndicator phase={phase} />
       </div>
 
       {/* Practice mode shortcut (top-right, very subtle) */}
       <button
-        className="absolute top-8 right-6 text-white/15 text-xs tracking-widest uppercase"
+        className="absolute top-safe right-6 text-white/15 text-xs tracking-widest uppercase"
         style={{ touchAction: 'none' }}
         onTouchStart={(e) => {
           e.stopPropagation();
