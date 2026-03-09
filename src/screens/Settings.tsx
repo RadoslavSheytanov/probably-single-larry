@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../state/store';
-import type { InputMethod } from '../utils/types';
 
 function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   return (
@@ -91,7 +90,7 @@ export default function Settings() {
       transition={{ type: 'spring', damping: 30, stiffness: 300 }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-6 pt-14 pb-4">
+      <div className="flex items-center justify-between px-6 pt-safe-header pb-4">
         <h2
           className="uppercase tracking-[6px] text-white/70 font-light"
           style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: 22 }}
@@ -108,15 +107,7 @@ export default function Settings() {
       </div>
 
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-6 pb-12">
-
-        <Row label="Input Method">
-          <SegmentPicker<InputMethod>
-            options={['touch', 'voice', 'both']}
-            value={settings.inputMethod}
-            onChange={(v) => updateSettings({ inputMethod: v })}
-          />
-        </Row>
+      <div className="flex-1 overflow-y-auto px-6 pb-safe-nav">
 
         {/* ntfy Topic */}
         <div className="py-4 border-b border-white/[0.04]">

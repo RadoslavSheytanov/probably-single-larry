@@ -45,7 +45,6 @@ interface AppState {
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
-  inputMethod: 'touch',
   ntfyTopic: '',
   autoSaveCalendar: false,
   watchPeekPreview: true,

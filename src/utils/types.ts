@@ -2,7 +2,6 @@ export type Phase = 'ANCHOR' | 'DIFFERENCE' | 'COMPUTED' | 'RESOLVING';
 
 export type Screen = 'home' | 'stealth' | 'result' | 'settings' | 'history' | 'practice';
 
-export type InputMethod = 'touch' | 'voice' | 'both';
 
 export interface StarSign {
   name: string;
@@ -30,7 +29,6 @@ export interface Reading {
 }
 
 export interface AppSettings {
-  inputMethod: InputMethod;
   ntfyTopic: string;
   autoSaveCalendar: boolean;
   watchPeekPreview: boolean;

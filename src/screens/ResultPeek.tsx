@@ -123,7 +123,7 @@ export default function ResultPeek() {
 
       {/* Action buttons */}
       <motion.div
-        className="flex flex-col gap-3 px-8 pb-12"
+        className="flex flex-col gap-3 px-8 pb-safe-nav"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}

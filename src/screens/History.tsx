@@ -44,7 +44,7 @@ export default function History() {
       transition={{ type: 'spring', damping: 30, stiffness: 300 }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-6 pt-14 pb-4">
+      <div className="flex items-center justify-between px-6 pt-safe-header pb-4">
         <h2
           className="uppercase tracking-[6px] text-white/70 font-light"
           style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: 22 }}
@@ -61,7 +61,7 @@ export default function History() {
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto px-6 pb-12">
+      <div className="flex-1 overflow-y-auto px-6 pb-safe-nav">
         {history.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full pb-20">
             <p className="text-white/15 text-sm tracking-widest uppercase">No readings yet</p>

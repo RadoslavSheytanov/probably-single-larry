@@ -22,6 +22,24 @@
   box-sizing: border-box;
 }
 
+@layer utilities {
+  /* Safe-area-aware header padding — accounts for notch / Dynamic Island */
+  .pt-safe-header {
+    padding-top: max(56px, calc(env(safe-area-inset-top, 0px) + 16px));
+  }
+  /* Safe-area-aware bottom padding — accounts for home indicator */
+  .pb-safe-nav {
+    padding-bottom: max(48px, calc(env(safe-area-inset-bottom, 0px) + 16px));
+  }
+  /* Safe-area-aware absolute positioning for elements near screen edges */
+  .top-safe {
+    top: max(32px, calc(env(safe-area-inset-top, 0px) + 8px));
+  }
+  .bottom-safe {
+    bottom: max(32px, calc(env(safe-area-inset-bottom, 0px) + 8px));
+  }
+}
+
 html,
 body,
 #root {

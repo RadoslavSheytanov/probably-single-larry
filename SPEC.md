@@ -126,39 +126,6 @@ Swipe down (full screen)     = EXIT to decoy calculator
 - Haptic: error pattern
 - Tap to dismiss, resets to ANCHOR phase
 
-#### Alternative Input: Voice Capture
-Selectable in settings. Uses Web Speech API.
-
-**How it works for Anchor (A):**
-1. App begins listening when stealth mode activates
-2. Spectator says their number aloud: "Twenty-four"
-3. Performer naturally repeats: "Twenty-four! That's wonderful..."
-4. App extracts the first integer it hears
-5. Number appears on screen at low opacity, haptic confirms
-6. App auto-advances to DIFFERENCE phase after 2-second silence
-
-**How it works for Difference (D):**
-1. App continues listening
-2. Performer weaves D into their reading: "I sense the number ten holds significance..."
-3. App captures the integer, haptic confirms
-4. Auto-computes and shows result
-
-**Speech Parsing Requirements:**
-- Handle word-form numbers: "twenty-four" -> 24, "thirteen" -> 13
-- Handle digit-form: "24" -> 24
-- Handle split digits: "two four" -> interpret as 24 (two-digit number, not 2 and 4)
-- Ignore filler words: "um", "uh", "like", "so"
-- Ignore non-number speech entirely
-- Timeout: if no number detected in 30 seconds, show subtle prompt
-
-**Voice Confidence Indicator:**
-- When a number is captured, briefly show it at opacity 0.2 with a checkmark
-- If confidence is low (< 0.7), show number at opacity 0.15 with a question mark
-- Performer can long-press to confirm, or double-tap to reject and re-listen
-
-**Fallback:**
-- If Web Speech API unavailable (iOS Safari restrictions), auto-switch to touch zones
-- Show brief subtle message: "Voice unavailable - using touch" at opacity 0.1
 
 ### 2.3 Result / Peek View
 
@@ -189,7 +156,6 @@ Slide-up panel from bottom. Dark surface (#0a0a0a).
 **Settings Items:**
 | Setting | Type | Default | Notes |
 |---------|------|---------|-------|
-| Input Method | Selector: Touch Zones / Voice / Both | Touch Zones | "Both" uses voice for A, touch for D |
 | ntfy Topic | Text input | empty | The secret topic URL suffix |
 | Auto-save Calendar | Toggle | OFF | Auto-downloads .ics on result |
 | Watch Peek Preview | Toggle | ON | Shows simulated watch card |
@@ -336,38 +302,156 @@ END:VCALENDAR
 
 ---
 
-## 5. Security & Anti-Piracy
+## 5. Mobile Platform Support
 
-### License Key Validation
-- First launch shows activation screen (email + license key inputs)
-- Key format: SNG-XXXX-XXXX-XXXX-XXXX (alphanumeric, uppercase)
-- Validation: SHA256("SINGULARIS:" + email.toLowerCase().trim() + ":" + SALT) -> first 16 chars, formatted with dashes
-- SALT is a hardcoded constant in the obfuscated source (e.g., "k9x2mP7qR4vL8nJ1")
-- Valid key + email stored in localStorage (only localStorage use in the app)
-- On subsequent launches: auto-validate stored key
-- If invalid or missing: only the activation screen is accessible
+### Target Platforms
+- **iOS Safari** (PWA installed via "Add to Home Screen") — primary target
+- **Android Chrome** (PWA installed via browser install prompt) — primary target
+- **Desktop Chrome** — secondary (for testing only)
 
-### Code Protection (Production Build)
-- Vite Terser minification: mangle toplevel, drop console, drop debugger, 3 passes
-- Post-build obfuscation via javascript-obfuscator with:
-  - control-flow-flattening
-  - dead-code-injection
-  - string-array with rc4 encoding
-  - self-defending
-  - debug-protection
-  - domain-lock to production domain
+### Safe Area & Viewport
+- All screens use `env(safe-area-inset-*)` padding to avoid notch / home indicator
+- `pt-safe` = `padding-top: env(safe-area-inset-top)` — applied to all fixed headers
+- `pb-safe` = `padding-bottom: env(safe-area-inset-bottom)` — applied to all bottom bars
+- Viewport meta: `width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover`
+- `position: fixed; inset: 0; overflow: hidden` on every screen — no scroll, no bounce
 
-### Anti-Debugging
-- Periodic debugger statement timing check
-- If DevTools detected (timing > 100ms), silently blank the app
+### Touch Targets
+- Minimum 44×44px for all interactive elements (Apple HIG + Material guidelines)
+- All tap zones fill the full half-screen — naturally exceed minimum
+- `onTouchStart` + `onClick` on every button (touch fires before click; `e.preventDefault()` blocks ghost click)
 
-### Domain Lock
-- Check window.location.hostname against allowed domains
-- If mismatch, silently blank the app (no error message)
+### iOS-Specific Behaviour
+- `apple-mobile-web-app-capable: yes` → runs in standalone mode (no Safari chrome)
+- `apple-mobile-web-app-status-bar-style: black-translucent` → status bar overlays app
+- No rubber-band scroll: `overscroll-behavior: none` globally
+- No text selection, callout, or tap highlight: set globally in CSS
+- Haptics: `navigator.vibrate` not supported on iOS — haptic calls must fail silently
+- Web Speech API: not available in iOS PWA — not applicable (voice removed)
+- Wake Lock: supported on iOS 16.4+ — acquire on stealth entry, release on exit
+
+### Android-Specific Behaviour
+- Chrome install banner appears automatically when PWA criteria met
+- Haptics: `navigator.vibrate` fully supported
+- Wake Lock: fully supported
+- Theme color `#000000` applies to system status bar and task switcher card
+
+### Responsive Layout
+- All layouts are single-column, full-bleed — no breakpoints needed
+- Font sizes specified in px (not rem) for precise control on small screens
+- Tested viewport: 375×812 (iPhone SE/13 mini), 390×844 (iPhone 14), 360×800 (Android mid-range)
 
 ---
 
-## 6. Design System
+## 6. Sales & Distribution
+
+### Storefront: Gumroad
+- Sell at a fixed one-time price (suggested: $49–$99 USD)
+- Gumroad handles: payment processing, VAT, receipt email, automatic license key generation
+- Each purchase generates one unique license key (Gumroad's built-in license system)
+- Key is shown on the receipt page and emailed to the buyer
+- Refund window: 7 days (Gumroad default)
+- No subscription — one-time payment, lifetime access
+
+### What the Buyer Receives
+1. Payment confirmation email with their unique license key
+2. Link to install the PWA (e.g., `https://singularis.app` or a custom domain)
+3. Short instruction: "Open the link on your phone → tap Share → Add to Home Screen → enter your key"
+
+### License Key Format
+```
+SNG-XXXX-XXXX-XXXX-XXXX
+```
+- Alphanumeric uppercase, groups of 4, prefixed `SNG-`
+- Generated by Gumroad per transaction — each key is globally unique
+- Stored in localStorage after successful validation
+
+---
+
+## 7. Security & Anti-Piracy
+
+### Authentication Architecture
+Two-layer validation — server validates once on first activation, local token used on every subsequent launch (offline-capable).
+
+```
+FIRST ACTIVATION (requires internet):
+  User enters email + license key
+       ↓
+  App POSTs to Cloudflare Worker validation endpoint
+       ↓
+  Worker calls Gumroad License API to verify key
+       ↓
+  If valid: Worker returns a signed HMAC token
+       ↓
+  App stores { email, key, token } in localStorage
+       ↓
+  App unlocks — full access
+
+SUBSEQUENT LAUNCHES (offline-capable):
+  App reads { email, key, token } from localStorage
+       ↓
+  Recomputes HMAC locally (secret embedded in obfuscated bundle)
+       ↓
+  If token matches: unlock immediately (no network needed)
+       ↓
+  If token missing or invalid: show LicenseGate again
+```
+
+### Cloudflare Worker (Validation Endpoint)
+- Free tier: 100,000 requests/day — more than sufficient
+- Endpoint: `POST https://auth.singularis.app/validate`
+- Request body: `{ email, key }`
+- Worker verifies key against Gumroad License API: `GET https://api.gumroad.com/v2/licenses/verify`
+- If Gumroad returns `{ success: true }`: generate HMAC token, return it
+- If Gumroad returns `{ success: false }`: return 403
+- Worker never returns the HMAC secret — only the token
+- HMAC formula: `HMAC-SHA256(email.toLowerCase() + ":" + key + ":" + SALT, WORKER_SECRET)`
+- WORKER_SECRET stored in Cloudflare environment variable (never in source)
+- SALT hardcoded in obfuscated app bundle (for local re-verification)
+
+### Local Token Verification
+- On each launch: recompute `HMAC-SHA256(email + ":" + key + ":" + SALT, SALT)` → compare to stored token
+- Note: local recomputation uses SALT as both message component and a second secret key — the full WORKER_SECRET is never in the client bundle
+- If match: unlocked. If mismatch: LicenseGate shown.
+- This means: if someone clears localStorage, they need internet to re-activate (Gumroad check repeats)
+
+### Key Revocation
+- To revoke: disable the key in Gumroad dashboard
+- If revoked key attempts activation on new device: Gumroad returns failure → blocked
+- Existing activated devices with valid local token continue to work (no remote kill switch — acceptable for a professional tool)
+- For extreme cases: rotate SALT in new app version → all tokens invalidated, everyone must re-activate
+
+### LicenseGate Screen
+- Shown on first launch or if local token is missing/invalid
+- Fields: Email address + License Key (format hint: SNG-XXXX-XXXX-XXXX-XXXX)
+- "Activate" button → calls validation endpoint → shows spinner → success or error
+- On success: fade into Home screen
+- On failure: red error message "Key not recognised — check your email or visit gumroad.com"
+- No "skip" option, no demo mode — gate is absolute
+
+### Code Protection (Production Build)
+- Vite Terser minification: mangle toplevel, drop console, drop debugger, 3 passes
+- Post-build obfuscation via javascript-obfuscator:
+  - `controlFlowFlattening: true`
+  - `deadCodeInjection: true`
+  - `stringArray: true, stringArrayEncoding: ['rc4']`
+  - `selfDefending: true`
+  - `debugProtection: true`
+  - `domainLock: ['singularis.app', 'www.singularis.app']`
+
+### Anti-Debugging
+- Periodic `debugger` statement timing check in a `setInterval`
+- If DevTools detected (timing delta > 100ms): silently blank the app (set root innerHTML to empty string)
+- No error message — app just goes black
+
+### Domain Lock
+- On load: check `window.location.hostname` against allowlist
+- If mismatch: silently blank the app
+- Allowlist: `['singularis.app', 'www.singularis.app', 'localhost']` (localhost for dev only — removed in prod build)
+
+---
+
+## 8. Design System
 
 ### Typography
 - Display/zodiac/headings: Cormorant Garamond (Google Fonts, 300/400/500)
@@ -411,7 +495,7 @@ err:     rgba(255,90,90,0.5)
 
 ---
 
-## 7. Keyboard Shortcuts (Desktop Testing)
+## 9. Keyboard Shortcuts (Desktop Testing)
 | Key | Action |
 |-----|--------|
 | Up Arrow | +1 (same as bottom zone tap) |
@@ -423,7 +507,7 @@ err:     rgba(255,90,90,0.5)
 
 ---
 
-## 8. Performance Targets
+## 10. Performance Targets
 - First Contentful Paint: < 400ms
 - Time to Interactive: < 800ms
 - Total bundle (gzipped): < 80KB
