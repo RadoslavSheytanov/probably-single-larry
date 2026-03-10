@@ -107,7 +107,6 @@ singularis-server/               ← License server (Node.js 24 + Hono)
 │       └── utils/
 │           ├── crypto.ts        # sha256()
 │           └── fingerprint.ts   # IP+UA hash for audit logging
-singularis-worker/               ← DEPRECATED — superseded by singularis-server/
 ```
 
 ## License Architecture
@@ -210,7 +209,7 @@ REVOCATION (POST /webhooks/gumroad with refunded=true):
 - Token is NOT one-time-use: same token can create sessions (one at a time)
 - session_id stored in memory only — forces re-exchange on page reload (feature not bug)
 - NETWORK_ERROR on heartbeat = tolerated (mobile networks drop); other errors = lock
-- singularis-worker/ left in place but superseded — can be deleted
+- singularis-worker/ deleted (was deprecated Cloudflare Worker stub)
 
 ## Safe-Area Utility Classes (src/index.css)
 ```
@@ -227,8 +226,5 @@ interface AppSettings {
   autoSaveCalendar: boolean;
   watchPeekPreview: boolean;
   hapticFeedback: boolean;
-  activationTaps: 3 | 5 | 7;
-  licenseKey: string;    // display only
-  licenseEmail: string;  // display only
 }
 ```

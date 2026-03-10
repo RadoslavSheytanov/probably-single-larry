@@ -49,9 +49,6 @@ const DEFAULT_SETTINGS: AppSettings = {
   autoSaveCalendar: false,
   watchPeekPreview: true,
   hapticFeedback: true,
-  activationTaps: 5,
-  licenseKey: '',
-  licenseEmail: '',
 };
 
 const DEFAULT_STEALTH: StealthState = {

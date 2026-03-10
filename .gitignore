@@ -30,3 +30,6 @@ dist-ssr
 
 # Env
 .env
+
+# Local clone (separate git repo, not tracked here)
+singularis/

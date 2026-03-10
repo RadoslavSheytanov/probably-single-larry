@@ -29,29 +29,6 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-function SegmentPicker<T extends string>({
-  options, value, onChange,
-}: { options: readonly T[]; value: T; onChange: (v: T) => void }) {
-  return (
-    <div className="flex gap-1">
-      {options.map((opt) => (
-        <button
-          key={opt}
-          className="px-3 py-1 rounded-lg text-xs tracking-wide font-light"
-          style={{
-            background: value === opt ? 'rgba(255,255,255,0.12)' : 'transparent',
-            color: value === opt ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.25)',
-            border: value === opt ? '1px solid rgba(255,255,255,0.15)' : '1px solid transparent',
-          }}
-          onTouchStart={(e) => { e.preventDefault(); onChange(opt); }}
-          onClick={() => onChange(opt)}
-        >
-          {opt}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 interface Props {
   onDeactivate?: () => void;
@@ -86,7 +63,6 @@ export default function Settings({ onDeactivate }: Props) {
   }
 
   function handleDeactivate() {
-    updateSettings({ licenseKey: '', licenseEmail: '' });
     onDeactivate?.();
   }
 
@@ -155,14 +131,6 @@ export default function Settings({ onDeactivate }: Props) {
           />
         </Row>
 
-        <Row label="Activation Taps">
-          <SegmentPicker<'3' | '5' | '7'>
-            options={['3', '5', '7']}
-            value={String(settings.activationTaps) as '3' | '5' | '7'}
-            onChange={(v) => updateSettings({ activationTaps: Number(v) as 3 | 5 | 7 })}
-          />
-        </Row>
-
         {/* Clear History */}
         <div className="py-4 border-b border-white/[0.04]">
           <AnimatePresence mode="wait">
@@ -195,24 +163,16 @@ export default function Settings({ onDeactivate }: Props) {
           </AnimatePresence>
         </div>
 
-        {/* License Key */}
+        {/* Session */}
         <div className="py-4 border-b border-white/[0.04]">
-          <p className="text-white/50 text-sm font-light mb-2">License Key</p>
-          {settings.licenseKey ? (
-            <>
-              <p className="text-white/25 text-xs font-mono mb-3">{settings.licenseKey}</p>
-              <button
-                className="text-xs tracking-wide font-light"
-                style={{ color: 'rgba(255,90,90,0.5)' }}
-                onTouchStart={(e) => { e.preventDefault(); handleDeactivate(); }}
-                onClick={handleDeactivate}
-              >
-                Deactivate
-              </button>
-            </>
-          ) : (
-            <p className="text-white/15 text-xs">Not activated</p>
-          )}
+          <button
+            className="text-xs tracking-wide font-light"
+            style={{ color: 'rgba(255,90,90,0.5)' }}
+            onTouchStart={(e) => { e.preventDefault(); handleDeactivate(); }}
+            onClick={handleDeactivate}
+          >
+            Deactivate session
+          </button>
         </div>
 
         {/* Version */}

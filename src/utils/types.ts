@@ -33,7 +33,4 @@ export interface AppSettings {
   autoSaveCalendar: boolean;
   watchPeekPreview: boolean;
   hapticFeedback: boolean;
-  activationTaps: 3 | 5 | 7;
-  licenseKey: string;
-  licenseEmail: string;
 }
