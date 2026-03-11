@@ -166,7 +166,7 @@ Set in `.env.production` (gitignored). For local dev use `.env` or `.env.local`.
 - Anti-debugging: setInterval timing check across debugger statement
 - Build: `npm run build:prod` = Terser + javascript-obfuscator on dist/assets
 
-## Current State — ALL PHASES COMPLETE
+## Current State — ALL PHASES COMPLETE + TESTED
 - Phase 0–5: Engine, screens, output channels, PWA polish
 - Phase 6: Licensing rewritten to Cloudflare Worker + localStorage HMAC (zero server cost)
   - singularis-worker/ built: CF Worker, Gumroad verify, HMAC-SHA256 token
@@ -176,6 +176,10 @@ Set in `.env.production` (gitignored). For local dev use `.env` or `.env.local`.
   - src/screens/Settings.tsx: shows stored email, Deactivate button
   - singularis-server/ deleted (no recurring cost architecture)
   - Typechecks: 0 errors
+- Bug fix: ntfy zodiac symbol moved from Title header to body
+  - HTTP headers are ISO-8859-1 only — Unicode symbols caused silent fetch failure
+  - Title is now sign name only (ASCII); body is `symbol date` (UTF-8 allowed)
+- End-to-end tested: engine, ntfy push to iPhone, watch peek preview all confirmed working
 
 ## Pre-Ship Checklist
 1. Deploy Cloudflare Worker:
@@ -201,7 +205,8 @@ Set in `.env.production` (gitignored). For local dev use `.env` or `.env.local`.
 - HMAC token stored in localStorage — validated locally on every launch (offline after activation)
 - Revocation: disable key in Gumroad → new activations blocked; existing devices keep working
 - This trade-off (no remote kill switch) is acceptable for a niche professional tool
-- singularis-worker/ deleted (was deprecated Cloudflare Worker stub)
+- ntfy Title header must be ASCII only — zodiac symbols go in the body, not the header
+- No external attribution in commits — keep commit messages clean, no co-author lines
 
 ## Safe-Area Utility Classes (src/index.css)
 ```
