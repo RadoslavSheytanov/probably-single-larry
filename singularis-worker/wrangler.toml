@@ -1,0 +1,11 @@
+name = "singularis-worker"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+[vars]
+# Non-secret config — set HMAC_SECRET and update GUMROAD_PERMALINK before deploying
+GUMROAD_PERMALINK = "singularis"
+
+# HMAC_SECRET is a Worker Secret (never in source):
+#   wrangler secret put HMAC_SECRET
+# Set VITE_LICENSE_SALT in .env.production to the same value.

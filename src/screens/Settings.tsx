@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../state/store';
+import { getStoredLicense } from '../services/license';
 
 function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   return (
@@ -163,15 +164,21 @@ export default function Settings({ onDeactivate }: Props) {
           </AnimatePresence>
         </div>
 
-        {/* Session */}
+        {/* License */}
         <div className="py-4 border-b border-white/[0.04]">
+          {(() => {
+            const stored = getStoredLicense();
+            return stored ? (
+              <p className="text-white/25 text-xs mb-3 truncate">{stored.email}</p>
+            ) : null;
+          })()}
           <button
             className="text-xs tracking-wide font-light"
             style={{ color: 'rgba(255,90,90,0.5)' }}
             onTouchStart={(e) => { e.preventDefault(); handleDeactivate(); }}
             onClick={handleDeactivate}
           >
-            Deactivate session
+            Deactivate
           </button>
         </div>
 
