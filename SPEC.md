@@ -347,66 +347,65 @@ END:VCALENDAR
 - No subscription — one-time payment, lifetime access
 
 ### What the Buyer Receives
-1. Purchase confirmation email containing their unique access link: `singularis.app?t=GUMROAD-LICENSE-KEY`
-2. Short instruction: "Open this link on your phone → tap Share → Add to Home Screen"
-3. The link IS the credential — bookmark it; opening it on any device starts a new session
+1. Purchase confirmation email containing their Gumroad license key
+2. Short instruction: "Open singularis.app on your phone → enter your email + license key → tap Activate → tap Share → Add to Home Screen"
+3. Activation is per-device and works offline after first activation
 
 ### License Key Format
-Gumroad-generated key used directly as the `?t=` token.
-- NOT stored in localStorage — session lives in memory only
-- One active session at a time (server enforces with Redis session count)
-- Token is permanent; sessions expire after 10 min without heartbeat
+Gumroad-generated key entered by the user on first activation.
+- Stored in localStorage after successful activation (alongside email and HMAC token)
+- Offline validation on every subsequent launch — no network required
+- One activation can be used on multiple devices (acceptable trade-off for zero server cost)
 
 ---
 
 ## 7. Security & Anti-Piracy
 
 ### Authentication Architecture
-URL-token + Redis session model. No localStorage for credentials — session lives in memory only.
+Cloudflare Worker (free tier) + localStorage HMAC model. Requires internet once per device; fully offline after first activation.
 
 ```
-EVERY LAUNCH (requires internet to unlock):
-  User opens singularis.app?t=GUMROAD-LICENSE-KEY
+FIRST ACTIVATION (requires internet, one-time per device):
+  User enters email + Gumroad license key in LicenseGate
        ↓
-  App captures token from URL, strips it from address bar
+  POST /validate to Cloudflare Worker
        ↓
-  POST /auth/exchange { token } → { session_id, expires_in: 600 }
+  Worker verifies key against Gumroad License API
        ↓
-  session_id stored in module-level JS variable (memory only)
+  If valid: Worker computes HMAC-SHA256(email:key, HMAC_SECRET) → token
        ↓
-  App unlocks — useHeartbeat starts (3-min interval, 10-min server TTL)
+  App stores { email, key, token } in localStorage (sg_e, sg_k, sg_t)
+       ↓
+  App unlocks
 
-SESSION MAINTENANCE:
-  POST /auth/heartbeat  Bearer {session_id}  → resets TTL to 10min
-  Heartbeat skipped when app is backgrounded (document.hidden)
-  Re-checked immediately on foreground (visibilitychange)
-  NETWORK_ERROR → tolerated, retry next interval
-  Any other failure → session expired → LicenseGate shown
+SUBSEQUENT LAUNCHES (fully offline):
+  validateStoredLicense() reads localStorage
+       ↓
+  Recomputes HMAC-SHA256(email:key, VITE_LICENSE_SALT) locally
+  (VITE_LICENSE_SALT must equal HMAC_SECRET — set before deploy)
+       ↓
+  If match → unlocked immediately, zero network calls
 
-LOGOUT / DEACTIVATE:
-  POST /auth/logout  Bearer {session_id}  → server deletes session
-  session_id cleared from memory → LicenseGate shown
+DEACTIVATE:
+  clearLicense() removes localStorage items → LicenseGate shown on next launch
 ```
 
-### License Server (singularis-server/)
-- Node.js 24 + Hono + `node:sqlite` + ioredis
-- `POST /auth/exchange`: SHA-256(token) → SQLite lookup, status check, Redis session count ≤ max_sessions (default 1), create session
-- `POST /auth/heartbeat`: verify session in Redis, re-check DB status, refresh TTL
-- `POST /auth/logout`: delete session keys from Redis
-- `POST /webhooks/gumroad`: on sale → insert token; on refund/dispute → set status='refunded', delete all active sessions
-- Deploy to Railway/Fly.io with Redis addon and persistent volume for `data/` (SQLite)
+### License Server (singularis-worker/)
+- Cloudflare Worker (free tier — 100,000 req/day, zero cost)
+- `POST /validate`: verifies email + key against Gumroad License API, rejects refunded/chargebacked purchases, returns HMAC-SHA256 token
+- No database, no Redis, no recurring server costs
 
 ### Key Revocation
-- Refund/dispute webhook: sets token status='refunded' in SQLite + deletes all Redis sessions immediately
-- Next heartbeat on client fails → LicenseGate shown within 3 minutes
-- Manual revocation: update SQLite status directly with `npm run add-token`
+- Disable key in Gumroad dashboard → all future fresh activations rejected
+- Existing activated devices continue to work (no remote kill switch — acceptable trade-off for zero server cost)
+- Refunded purchases: Gumroad marks key as refunded → Worker rejects it on any new activation attempt
 
 ### LicenseGate Screen
-- Shown on launch (no URL token), token exchange failure, session expiry, or manual deactivation
-- Input accepts full access URL (`singularis.app?t=…`) or raw token
-- "Unlock" button → calls `/auth/exchange` → spinner → success or error
-- On success: fade into app
-- On failure: red error ("Cannot reach license server" or server error message)
+- Shown on first launch, after deactivation, or if localStorage is cleared/tampered
+- Two inputs: email address + Gumroad license key
+- "Activate" button → calls Cloudflare Worker → spinner → success or error
+- On success: stores credentials, fades into app
+- On failure: red error (invalid key, refunded, network error)
 - No skip option, no demo mode — gate is absolute
 
 ### Code Protection (Production Build)
