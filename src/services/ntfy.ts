@@ -13,10 +13,10 @@ export async function ntfySend(
   if (!topic.trim()) return;
 
   const sign = primary.sign;
-  const title = `${sign.symbol} ${sign.name}`;
+  const title = sign.name;
   const body = alternate
-    ? `${formatDate(primary)}  OR  ${formatDate(alternate)}`
-    : formatDate(primary);
+    ? `${sign.symbol} ${formatDate(primary)}  OR  ${formatDate(alternate)}`
+    : `${sign.symbol} ${formatDate(primary)}`;
 
   try {
     await fetch(`https://ntfy.sh/${topic.trim()}`, {
