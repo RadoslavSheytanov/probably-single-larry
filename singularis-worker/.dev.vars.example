@@ -1,0 +1,4 @@
+# Copy to .dev.vars for local development (wrangler dev)
+# Must match VITE_LICENSE_SALT in .env (or .env.local) for local PWA testing
+HMAC_SECRET=dev-only-secret-change-in-prod
+GUMROAD_PERMALINK=singularis
