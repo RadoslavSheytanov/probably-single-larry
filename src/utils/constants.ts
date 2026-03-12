@@ -5,9 +5,5 @@ export const MONTH_NAMES = [
 
 export const DAYS_IN_MONTH = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] as const;
 
-export const LICENSE_SALT = 'k9x2mP7qR4vL8nJ1';
-
 export const LONG_PRESS_MS = 600;
 export const DOUBLE_TAP_MS = 300;
-export const ACTIVATION_WINDOW_MS = 2000;
-export const ACTIVATION_TAP_GAP_MS = 400;
