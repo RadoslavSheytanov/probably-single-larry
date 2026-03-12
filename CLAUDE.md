@@ -52,46 +52,44 @@ probably-single-larry/           ← repo root (branch: develop)
 ├── vite.config.ts
 ├── tsconfig.json
 ├── index.html                   # title="Calculator"
-├── .env.production              # VITE_SERVER_URL=https://your-server.com
+├── .env.production              # VITE_WORKER_URL + VITE_LICENSE_SALT (gitignored)
 ├── public/icons/
-└── src/
-    ├── main.tsx                 # Domain lock + anti-debug (PROD only)
-    ├── App.tsx                  # URL token capture → exchange → heartbeat → screens
-    ├── index.css                # Tailwind @import + safe-area utilities
-    ├── state/store.ts           # Zustand store
-    ├── engine/
-    │   ├── singularis.ts
-    │   ├── starsigns.ts
-    │   └── engine.test.ts       # 30/30 passing
-    ├── screens/
-    │   ├── LicenseGate.tsx      # Token paste/input → exchange → unlock
-    │   ├── Home.tsx
-    │   ├── StealthInput.tsx
-    │   ├── ResultPeek.tsx
-    │   ├── Settings.tsx         # onDeactivate prop → logout() → needs-auth
-    │   ├── History.tsx
-    │   └── PracticeMode.tsx
-    ├── components/
-    │   ├── WatchPreview.tsx
-    │   └── PhaseIndicator.tsx
-    ├── services/
-    │   ├── license.ts           # activateLicense, validateStoredLicense, clearLicense
-    │   ├── ntfy.ts
-    │   ├── ics.ts
-    │   ├── haptics.ts
-    │   └── wakeLock.ts
-    ├── hooks/
-    │   └── useStealthInput.ts
-    └── utils/
-        ├── constants.ts
-        └── types.ts
-singularis-worker/               ← Cloudflare Worker (free tier) — license validation
-│   ├── package.json             # wrangler, @cloudflare/workers-types
-│   ├── wrangler.toml            # name, compatibility_date, GUMROAD_PERMALINK var
-│   ├── tsconfig.json
-│   ├── .dev.vars.example        # HMAC_SECRET, GUMROAD_PERMALINK for local dev
-│   └── src/
-│       └── index.ts             # POST /validate: Gumroad verify → HMAC token
+├── src/
+│   ├── main.tsx                 # Domain lock + anti-debug (PROD only)
+│   ├── App.tsx                  # validateStoredLicense on mount → checking/active/needs-auth
+│   ├── index.css                # Tailwind @import + safe-area utilities
+│   ├── state/store.ts           # Zustand store
+│   ├── engine/
+│   │   ├── singularis.ts
+│   │   ├── starsigns.ts
+│   │   └── engine.test.ts       # 30/30 passing
+│   ├── screens/
+│   │   ├── LicenseGate.tsx      # Email + license key input → activateLicense → unlock
+│   │   ├── Home.tsx
+│   │   ├── StealthInput.tsx
+│   │   ├── ResultPeek.tsx
+│   │   ├── Settings.tsx         # onDeactivate prop → clearLicense() → needs-auth
+│   │   ├── History.tsx
+│   │   └── PracticeMode.tsx
+│   ├── components/
+│   │   └── PhaseIndicator.tsx
+│   ├── services/
+│   │   ├── license.ts           # activateLicense, validateStoredLicense, clearLicense, getStoredEmail
+│   │   ├── ntfy.ts
+│   │   ├── haptics.ts
+│   │   └── wakeLock.ts
+│   ├── hooks/
+│   │   └── useStealthInput.ts
+│   └── utils/
+│       ├── constants.ts
+│       └── types.ts
+└── singularis-worker/           ← Cloudflare Worker (free tier) — license validation
+    ├── package.json             # wrangler, @cloudflare/workers-types
+    ├── wrangler.toml            # name, compatibility_date, GUMROAD_PERMALINK var
+    ├── tsconfig.json
+    ├── .dev.vars.example        # HMAC_SECRET, GUMROAD_PERMALINK for local dev
+    └── src/
+        └── index.ts             # POST /validate: Gumroad verify → HMAC token
 ```
 
 ## License Architecture
