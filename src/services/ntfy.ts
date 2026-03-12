@@ -13,9 +13,9 @@ export async function ntfySend(
   if (!topic.trim()) return;
 
   const sign = primary.sign;
-  const title = `${sign.symbol} ${sign.name}`;
+  const title = sign.name;
   const body = alternate
-    ? `${formatDate(primary)}  OR  ${formatDate(alternate)}`
+    ? `${formatDate(primary)} or ${formatDate(alternate)}`
     : formatDate(primary);
 
   try {
@@ -24,7 +24,6 @@ export async function ntfySend(
       headers: {
         Title: title,
         Priority: '2',
-        Tags: 'crystal_ball',
       },
       body,
     });

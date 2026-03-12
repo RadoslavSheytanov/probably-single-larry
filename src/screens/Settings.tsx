@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../state/store';
+import { getStoredEmail } from '../services/license';
 
 function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   return (
@@ -29,30 +30,6 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-function SegmentPicker<T extends string>({
-  options, value, onChange,
-}: { options: readonly T[]; value: T; onChange: (v: T) => void }) {
-  return (
-    <div className="flex gap-1">
-      {options.map((opt) => (
-        <button
-          key={opt}
-          className="px-3 py-1 rounded-lg text-xs tracking-wide font-light"
-          style={{
-            background: value === opt ? 'rgba(255,255,255,0.12)' : 'transparent',
-            color: value === opt ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.25)',
-            border: value === opt ? '1px solid rgba(255,255,255,0.15)' : '1px solid transparent',
-          }}
-          onTouchStart={(e) => { e.preventDefault(); onChange(opt); }}
-          onClick={() => onChange(opt)}
-        >
-          {opt}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 interface Props {
   onDeactivate?: () => void;
 }
@@ -65,6 +42,8 @@ export default function Settings({ onDeactivate }: Props) {
 
   const [confirmClear, setConfirmClear] = useState(false);
   const [ntfyInput, setNtfyInput] = useState(settings.ntfyTopic);
+
+  const storedEmail = getStoredEmail();
 
   function handleNtfyBlur() {
     updateSettings({ ntfyTopic: ntfyInput.trim() });
@@ -83,11 +62,6 @@ export default function Settings({ onDeactivate }: Props) {
   function handleClose() {
     updateSettings({ ntfyTopic: ntfyInput.trim() });
     setScreen('home');
-  }
-
-  function handleDeactivate() {
-    updateSettings({ licenseKey: '', licenseEmail: '' });
-    onDeactivate?.();
   }
 
   return (
@@ -134,32 +108,10 @@ export default function Settings({ onDeactivate }: Props) {
           <p className="text-white/15 text-xs mt-2">Used for watch notifications via ntfy.sh</p>
         </div>
 
-        <Row label="Auto-save Calendar">
-          <Toggle
-            on={settings.autoSaveCalendar}
-            onToggle={() => updateSettings({ autoSaveCalendar: !settings.autoSaveCalendar })}
-          />
-        </Row>
-
-        <Row label="Watch Peek Preview">
-          <Toggle
-            on={settings.watchPeekPreview}
-            onToggle={() => updateSettings({ watchPeekPreview: !settings.watchPeekPreview })}
-          />
-        </Row>
-
         <Row label="Haptic Feedback">
           <Toggle
             on={settings.hapticFeedback}
             onToggle={() => updateSettings({ hapticFeedback: !settings.hapticFeedback })}
-          />
-        </Row>
-
-        <Row label="Activation Taps">
-          <SegmentPicker<'3' | '5' | '7'>
-            options={['3', '5', '7']}
-            value={String(settings.activationTaps) as '3' | '5' | '7'}
-            onChange={(v) => updateSettings({ activationTaps: Number(v) as 3 | 5 | 7 })}
           />
         </Row>
 
@@ -195,17 +147,17 @@ export default function Settings({ onDeactivate }: Props) {
           </AnimatePresence>
         </div>
 
-        {/* License Key */}
+        {/* License */}
         <div className="py-4 border-b border-white/[0.04]">
-          <p className="text-white/50 text-sm font-light mb-2">License Key</p>
-          {settings.licenseKey ? (
+          <p className="text-white/50 text-sm font-light mb-2">License</p>
+          {storedEmail ? (
             <>
-              <p className="text-white/25 text-xs font-mono mb-3">{settings.licenseKey}</p>
+              <p className="text-white/25 text-xs mb-3">{storedEmail}</p>
               <button
                 className="text-xs tracking-wide font-light"
                 style={{ color: 'rgba(255,90,90,0.5)' }}
-                onTouchStart={(e) => { e.preventDefault(); handleDeactivate(); }}
-                onClick={handleDeactivate}
+                onTouchStart={(e) => { e.preventDefault(); onDeactivate?.(); }}
+                onClick={() => onDeactivate?.()}
               >
                 Deactivate
               </button>

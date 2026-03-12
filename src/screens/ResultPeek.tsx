@@ -1,8 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useStore } from '../state/store';
-import WatchPreview from '../components/WatchPreview';
-import { downloadICS } from '../services/ics';
 import { MONTH_NAMES } from '../utils/constants';
 import type { ResolvedDate } from '../utils/types';
 
@@ -12,12 +10,7 @@ export default function ResultPeek() {
   const addReading = useStore((s) => s.addReading);
   const resolvedDate = useStore((s) => s.stealth.resolvedDate);
   const engineResult = useStore((s) => s.stealth.engineResult);
-  const settings = useStore((s) => s.settings);
 
-  const [watchVisible, setWatchVisible] = useState(settings.watchPeekPreview);
-  const [saved, setSaved] = useState(false);
-
-  // The date we're displaying — resolved single date
   const date: ResolvedDate | null = resolvedDate;
 
   // Record to history on mount (only once)
@@ -29,14 +22,6 @@ export default function ResultPeek() {
       result: engineResult,
       resolvedDate: date,
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // intentionally only on mount
-
-  // Auto-save calendar if enabled
-  useEffect(() => {
-    if (settings.autoSaveCalendar && date) {
-      downloadICS(date);
-    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -50,15 +35,7 @@ export default function ResultPeek() {
     setScreen('home');
   }, [resetStealth, setScreen]);
 
-  const handleSaveCalendar = useCallback(() => {
-    if (!date) return;
-    downloadICS(date);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  }, [date]);
-
   if (!date) {
-    // Fallback — should not happen in normal flow
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center">
         <button className="text-white/30 text-sm" onClick={handleHome}>Back</button>
@@ -76,13 +53,6 @@ export default function ResultPeek() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.6 }}
     >
-      {/* Watch preview — top right */}
-      <WatchPreview
-        date={date}
-        visible={watchVisible}
-        onDismiss={() => setWatchVisible(false)}
-      />
-
       {/* Main content */}
       <motion.div
         className="flex-1 flex flex-col items-center justify-center px-8"
@@ -129,18 +99,8 @@ export default function ResultPeek() {
         transition={{ delay: 0.5 }}
       >
         <button
-          className="w-full py-4 rounded-2xl border text-sm tracking-[3px] uppercase font-light"
-          style={{
-            borderColor: saved ? 'rgba(255,159,10,0.5)' : 'rgba(255,159,10,0.3)',
-            color: saved ? 'rgba(255,159,10,0.9)' : 'rgba(255,159,10,0.6)',
-          }}
-          onClick={handleSaveCalendar}
-        >
-          {saved ? 'Saved ✓' : 'Save to Calendar'}
-        </button>
-
-        <button
           className="w-full py-4 rounded-2xl border border-white/10 text-white/50 text-sm tracking-[3px] uppercase font-light"
+          onTouchStart={(e) => { e.preventDefault(); handleNewReading(); }}
           onClick={handleNewReading}
         >
           New Reading
@@ -148,6 +108,7 @@ export default function ResultPeek() {
 
         <button
           className="w-full py-3 text-white/20 text-xs tracking-widest uppercase"
+          onTouchStart={(e) => { e.preventDefault(); handleHome(); }}
           onClick={handleHome}
         >
           Home

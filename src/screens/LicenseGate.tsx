@@ -1,28 +1,27 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { exchangeToken, parseTokenFromInput } from '../services/license';
+import { activateLicense } from '../services/license';
 
 interface Props {
   onActivated: () => void;
-  initialError?: string;
 }
 
-export default function LicenseGate({ onActivated, initialError = '' }: Props) {
-  const [input, setInput] = useState('');
+export default function LicenseGate({ onActivated }: Props) {
+  const [email, setEmail] = useState('');
+  const [key, setKey] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(initialError);
+  const [error, setError] = useState('');
 
-  async function handleUnlock() {
-    const token = parseTokenFromInput(input);
-    if (!token) {
-      setError('Paste your access link or license key.');
+  async function handleActivate() {
+    if (!email.trim() || !key.trim()) {
+      setError('Enter your email and license key.');
       return;
     }
 
     setLoading(true);
     setError('');
 
-    const result = await exchangeToken(token);
+    const result = await activateLicense(email, key);
     if (result.ok) {
       onActivated();
     } else {
@@ -32,7 +31,7 @@ export default function LicenseGate({ onActivated, initialError = '' }: Props) {
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter' && !loading) handleUnlock();
+    if (e.key === 'Enter' && !loading) handleActivate();
   }
 
   return (
@@ -49,25 +48,36 @@ export default function LicenseGate({ onActivated, initialError = '' }: Props) {
           className="text-4xl font-light tracking-widest uppercase text-white/70 mb-3"
           style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}
         >
-          Unlock
+          Activate
         </h1>
         <p className="text-white/20 text-xs tracking-wide text-center leading-relaxed">
-          Paste your access link or the key from your purchase email
+          Enter the email and license key from your purchase confirmation
         </p>
       </div>
 
-      {/* Input */}
-      <div className="flex-1 flex flex-col justify-center px-8 gap-4">
+      {/* Inputs */}
+      <div className="flex-1 flex flex-col justify-center px-8 gap-3">
         <input
-          type="text"
-          placeholder="singularis.app?t=… or YOUR-LICENSE-KEY"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
+          type="email"
+          placeholder="your@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           onKeyDown={handleKeyDown}
           autoCapitalize="none"
           autoCorrect="off"
           spellCheck={false}
-          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-4 text-white/70 text-sm font-mono placeholder-white/10 outline-none focus:border-white/20"
+          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-4 text-white/70 text-sm placeholder-white/15 outline-none focus:border-white/20"
+        />
+        <input
+          type="text"
+          placeholder="XXXX-XXXX-XXXX-XXXX"
+          value={key}
+          onChange={(e) => setKey(e.target.value)}
+          onKeyDown={handleKeyDown}
+          autoCapitalize="characters"
+          autoCorrect="off"
+          spellCheck={false}
+          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-4 text-white/70 text-sm font-mono placeholder-white/15 outline-none focus:border-white/20"
         />
 
         <AnimatePresence>
@@ -89,17 +99,17 @@ export default function LicenseGate({ onActivated, initialError = '' }: Props) {
           className="w-full py-4 rounded-2xl border border-white/10 text-white/70 text-sm tracking-[4px] uppercase font-light"
           style={{ background: 'rgba(255,255,255,0.03)' }}
           whileTap={loading ? {} : { scale: 0.97 }}
-          onTouchStart={(e) => { e.preventDefault(); if (!loading) handleUnlock(); }}
-          onClick={() => { if (!loading) handleUnlock(); }}
+          onTouchStart={(e) => { e.preventDefault(); if (!loading) handleActivate(); }}
+          onClick={() => { if (!loading) handleActivate(); }}
           disabled={loading}
         >
           {loading
             ? <span className="inline-block w-4 h-4 border border-white/30 border-t-white/70 rounded-full animate-spin" />
-            : 'Unlock'}
+            : 'Activate'}
         </motion.button>
 
         <a
-          href="https://gumroad.com"
+          href="https://gumroad.com/l/singularis"
           target="_blank"
           rel="noopener noreferrer"
           className="text-center text-white/15 text-xs tracking-widest uppercase"
