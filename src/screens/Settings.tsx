@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../state/store';
-import { getStoredLicense } from '../services/license';
+import { getStoredEmail } from '../services/license';
 
 function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   return (
@@ -30,7 +30,6 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-
 interface Props {
   onDeactivate?: () => void;
 }
@@ -43,6 +42,8 @@ export default function Settings({ onDeactivate }: Props) {
 
   const [confirmClear, setConfirmClear] = useState(false);
   const [ntfyInput, setNtfyInput] = useState(settings.ntfyTopic);
+
+  const storedEmail = getStoredEmail();
 
   function handleNtfyBlur() {
     updateSettings({ ntfyTopic: ntfyInput.trim() });
@@ -61,10 +62,6 @@ export default function Settings({ onDeactivate }: Props) {
   function handleClose() {
     updateSettings({ ntfyTopic: ntfyInput.trim() });
     setScreen('home');
-  }
-
-  function handleDeactivate() {
-    onDeactivate?.();
   }
 
   return (
@@ -111,20 +108,6 @@ export default function Settings({ onDeactivate }: Props) {
           <p className="text-white/15 text-xs mt-2">Used for watch notifications via ntfy.sh</p>
         </div>
 
-        <Row label="Auto-save Calendar">
-          <Toggle
-            on={settings.autoSaveCalendar}
-            onToggle={() => updateSettings({ autoSaveCalendar: !settings.autoSaveCalendar })}
-          />
-        </Row>
-
-        <Row label="Watch Peek Preview">
-          <Toggle
-            on={settings.watchPeekPreview}
-            onToggle={() => updateSettings({ watchPeekPreview: !settings.watchPeekPreview })}
-          />
-        </Row>
-
         <Row label="Haptic Feedback">
           <Toggle
             on={settings.hapticFeedback}
@@ -166,20 +149,22 @@ export default function Settings({ onDeactivate }: Props) {
 
         {/* License */}
         <div className="py-4 border-b border-white/[0.04]">
-          {(() => {
-            const stored = getStoredLicense();
-            return stored ? (
-              <p className="text-white/25 text-xs mb-3 truncate">{stored.email}</p>
-            ) : null;
-          })()}
-          <button
-            className="text-xs tracking-wide font-light"
-            style={{ color: 'rgba(255,90,90,0.5)' }}
-            onTouchStart={(e) => { e.preventDefault(); handleDeactivate(); }}
-            onClick={handleDeactivate}
-          >
-            Deactivate
-          </button>
+          <p className="text-white/50 text-sm font-light mb-2">License</p>
+          {storedEmail ? (
+            <>
+              <p className="text-white/25 text-xs mb-3">{storedEmail}</p>
+              <button
+                className="text-xs tracking-wide font-light"
+                style={{ color: 'rgba(255,90,90,0.5)' }}
+                onTouchStart={(e) => { e.preventDefault(); onDeactivate?.(); }}
+                onClick={() => onDeactivate?.()}
+              >
+                Deactivate
+              </button>
+            </>
+          ) : (
+            <p className="text-white/15 text-xs">Not activated</p>
+          )}
         </div>
 
         {/* Version */}

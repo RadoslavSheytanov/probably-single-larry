@@ -14,7 +14,7 @@ export default function LicenseGate({ onActivated }: Props) {
 
   async function handleActivate() {
     if (!email.trim() || !key.trim()) {
-      setError('Enter your purchase email and license key.');
+      setError('Enter your email and license key.');
       return;
     }
 
@@ -59,26 +59,25 @@ export default function LicenseGate({ onActivated }: Props) {
       <div className="flex-1 flex flex-col justify-center px-8 gap-3">
         <input
           type="email"
-          placeholder="Purchase email"
+          placeholder="your@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           onKeyDown={handleKeyDown}
           autoCapitalize="none"
           autoCorrect="off"
           spellCheck={false}
-          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-4 text-white/70 text-sm placeholder-white/10 outline-none focus:border-white/20"
+          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-4 text-white/70 text-sm placeholder-white/15 outline-none focus:border-white/20"
         />
-
         <input
           type="text"
-          placeholder="License key"
+          placeholder="XXXX-XXXX-XXXX-XXXX"
           value={key}
           onChange={(e) => setKey(e.target.value)}
           onKeyDown={handleKeyDown}
-          autoCapitalize="none"
+          autoCapitalize="characters"
           autoCorrect="off"
           spellCheck={false}
-          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-4 text-white/70 text-sm font-mono placeholder-white/10 outline-none focus:border-white/20"
+          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-4 text-white/70 text-sm font-mono placeholder-white/15 outline-none focus:border-white/20"
         />
 
         <AnimatePresence>
@@ -110,7 +109,7 @@ export default function LicenseGate({ onActivated }: Props) {
         </motion.button>
 
         <a
-          href="https://gumroad.com"
+          href="https://gumroad.com/l/singularis"
           target="_blank"
           rel="noopener noreferrer"
           className="text-center text-white/15 text-xs tracking-widest uppercase"

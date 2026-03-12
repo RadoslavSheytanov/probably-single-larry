@@ -30,7 +30,5 @@ export interface Reading {
 
 export interface AppSettings {
   ntfyTopic: string;
-  autoSaveCalendar: boolean;
-  watchPeekPreview: boolean;
   hapticFeedback: boolean;
 }

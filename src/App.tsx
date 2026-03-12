@@ -37,11 +37,11 @@ export default function App() {
 
   return (
     <AnimatePresence mode="wait">
-      {screen === 'home'     && <Home key="home" />}
-      {screen === 'stealth'  && <StealthInput key="stealth" />}
-      {screen === 'result'   && <ResultPeek key="result" />}
+      {screen === 'home' && <Home key="home" />}
+      {screen === 'stealth' && <StealthInput key="stealth" />}
+      {screen === 'result' && <ResultPeek key="result" />}
       {screen === 'settings' && <Settings key="settings" onDeactivate={handleDeactivate} />}
-      {screen === 'history'  && <History key="history" />}
+      {screen === 'history' && <History key="history" />}
       {screen === 'practice' && <PracticeMode key="practice" />}
     </AnimatePresence>
   );

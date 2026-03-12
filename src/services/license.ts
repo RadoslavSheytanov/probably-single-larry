@@ -1,66 +1,46 @@
 /**
- * License service — Cloudflare Worker activation + local HMAC verification
+ * License service — Cloudflare Worker + localStorage HMAC
  *
  * Flow:
  *   FIRST ACTIVATION (requires internet):
- *     1. User enters email + Gumroad license key in LicenseGate
- *     2. activateLicense() → POST /validate to Cloudflare Worker
- *     3. Worker verifies key against Gumroad API → returns HMAC token
- *     4. { email, key, token } stored in localStorage
+ *     activateLicense(email, key) → POST /validate to CF Worker
+ *     Worker verifies key with Gumroad → returns HMAC-SHA256(email:key, HMAC_SECRET)
+ *     App stores { email, key, token } in localStorage (sg_e, sg_k, sg_t)
  *
- *   SUBSEQUENT LAUNCHES (offline-capable):
- *     1. validateStoredLicense() reads localStorage
- *     2. Recomputes HMAC locally with VITE_LICENSE_SALT
- *     3. If token matches → unlocked immediately, no network call
+ *   SUBSEQUENT LAUNCHES (fully offline):
+ *     validateStoredLicense() reads localStorage
+ *     Recomputes HMAC locally using VITE_LICENSE_SALT (must equal HMAC_SECRET)
+ *     Match → unlocked, no network call
  *
  *   DEACTIVATION:
- *     clearLicense() wipes localStorage → LicenseGate shown on next launch
+ *     clearLicense() removes all three localStorage keys
  */
 
 const WORKER_URL = (import.meta.env.VITE_WORKER_URL as string | undefined)?.replace(/\/$/, '')
   ?? 'http://localhost:8787';
 
-// Must match HMAC_SECRET set in the Cloudflare Worker via `wrangler secret put HMAC_SECRET`
-const SALT = (import.meta.env.VITE_LICENSE_SALT as string | undefined) ?? 'dev-only-salt';
+// Must equal HMAC_SECRET set in the Cloudflare Worker.
+// Set VITE_LICENSE_SALT in .env.production; dev fallback is the constant.
+const LICENSE_SALT = (import.meta.env.VITE_LICENSE_SALT as string | undefined)
+  ?? 'k9x2mP7qR4vL8nJ1';
 
 const LS_EMAIL = 'sg_e';
 const LS_KEY   = 'sg_k';
 const LS_TOKEN = 'sg_t';
 
-async function computeHMAC(email: string, key: string): Promise<string> {
+async function computeHMAC(data: string, secret: string): Promise<string> {
   const enc = new TextEncoder();
-  const cryptoKey = await crypto.subtle.importKey(
+  const key = await crypto.subtle.importKey(
     'raw',
-    enc.encode(SALT),
+    enc.encode(secret),
     { name: 'HMAC', hash: 'SHA-256' },
     false,
     ['sign'],
   );
-  const sig = await crypto.subtle.sign('HMAC', cryptoKey, enc.encode(`${email}:${key}`));
+  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(data));
   return Array.from(new Uint8Array(sig))
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
-}
-
-export interface StoredLicense {
-  email: string;
-  key: string;
-  token: string;
-}
-
-export function getStoredLicense(): StoredLicense | null {
-  const email = localStorage.getItem(LS_EMAIL);
-  const key   = localStorage.getItem(LS_KEY);
-  const token = localStorage.getItem(LS_TOKEN);
-  if (!email || !key || !token) return null;
-  return { email, key, token };
-}
-
-export async function validateStoredLicense(): Promise<boolean> {
-  const stored = getStoredLicense();
-  if (!stored) return false;
-  const expected = await computeHMAC(stored.email, stored.key);
-  return expected === stored.token;
 }
 
 export type ActivateResult =
@@ -68,11 +48,14 @@ export type ActivateResult =
   | { ok: false; error: string };
 
 export async function activateLicense(email: string, key: string): Promise<ActivateResult> {
+  const normEmail = email.toLowerCase().trim();
+  const normKey   = key.toUpperCase().trim();
+
   try {
     const res = await fetch(`${WORKER_URL}/validate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.toLowerCase().trim(), key: key.toUpperCase().trim() }),
+      body: JSON.stringify({ email: normEmail, key: normKey }),
     });
 
     const data = await res.json() as { token?: string; error?: string };
@@ -81,18 +64,31 @@ export async function activateLicense(email: string, key: string): Promise<Activ
       return { ok: false, error: data.error ?? 'Activation failed.' };
     }
 
-    localStorage.setItem(LS_EMAIL, email.toLowerCase().trim());
-    localStorage.setItem(LS_KEY,   key.toUpperCase().trim());
+    localStorage.setItem(LS_EMAIL, normEmail);
+    localStorage.setItem(LS_KEY, normKey);
     localStorage.setItem(LS_TOKEN, data.token);
-
     return { ok: true };
   } catch {
-    return { ok: false, error: 'Cannot reach the activation server. Check your connection.' };
+    return { ok: false, error: 'Cannot reach activation server. Check your connection.' };
   }
+}
+
+export async function validateStoredLicense(): Promise<boolean> {
+  const email  = localStorage.getItem(LS_EMAIL);
+  const key    = localStorage.getItem(LS_KEY);
+  const stored = localStorage.getItem(LS_TOKEN);
+  if (!email || !key || !stored) return false;
+
+  const expected = await computeHMAC(`${email}:${key}`, LICENSE_SALT);
+  return expected === stored;
 }
 
 export function clearLicense(): void {
   localStorage.removeItem(LS_EMAIL);
   localStorage.removeItem(LS_KEY);
   localStorage.removeItem(LS_TOKEN);
+}
+
+export function getStoredEmail(): string | null {
+  return localStorage.getItem(LS_EMAIL);
 }
