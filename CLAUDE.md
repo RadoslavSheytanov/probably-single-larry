@@ -170,16 +170,18 @@ Set in `.env.production` (gitignored). For local dev use `.env` or `.env.local`.
 - Phase 0–5: Engine, screens, output channels, PWA polish
 - Phase 6: Licensing rewritten to Cloudflare Worker + localStorage HMAC (zero server cost)
   - singularis-worker/ built: CF Worker, Gumroad verify, HMAC-SHA256 token
-  - src/services/license.ts: activateLicense, validateStoredLicense, clearLicense
+  - src/services/license.ts: activateLicense, validateStoredLicense, clearLicense, getStoredEmail
   - src/screens/LicenseGate.tsx: email + key fields, activate flow
   - src/App.tsx: simple checking/active/needs-auth state, no heartbeat
   - src/screens/Settings.tsx: shows stored email, Deactivate button
-  - singularis-server/ deleted (no recurring cost architecture)
+  - src/hooks/useHeartbeat.ts: deleted (not needed in offline HMAC model)
+  - AppSettings cleaned: removed activationTaps, licenseKey, licenseEmail, autoSaveCalendar, watchPeekPreview
+  - WatchPreview.tsx + ics.ts deleted (calendar/watch preview removed — PWAs cannot write system calendar)
   - Typechecks: 0 errors
-- Bug fix: ntfy zodiac symbol moved from Title header to body
-  - HTTP headers are ISO-8859-1 only — Unicode symbols caused silent fetch failure
-  - Title is now sign name only (ASCII); body is `symbol date` (UTF-8 allowed)
-- End-to-end tested: engine, ntfy push to iPhone, watch peek preview all confirmed working
+- Bug fix: ntfy notification — title ASCII-only, body plain text (no symbols, no emoji tags)
+  - ntfy format: Title = sign name, Body = "December 6" or "December 6 or January 15"
+- Home screen: Inter font added, word-by-word animated quote reveal (Framer Motion stagger)
+- End-to-end tested: engine, ntfy push to iPhone confirmed working
 
 ## Pre-Ship Checklist
 1. Deploy Cloudflare Worker:
@@ -220,8 +222,6 @@ Set in `.env.production` (gitignored). For local dev use `.env` or `.env.local`.
 ```ts
 interface AppSettings {
   ntfyTopic: string;
-  autoSaveCalendar: boolean;
-  watchPeekPreview: boolean;
   hapticFeedback: boolean;
 }
 ```
