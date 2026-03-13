@@ -32,7 +32,7 @@ export default function Home() {
       {/* Header */}
       <div className="flex flex-col items-center pt-safe-header px-8 pb-0">
         <p
-          className="text-[10px] tracking-[8px] uppercase text-white/30"
+          className="text-[9px] tracking-[8px] uppercase text-white/30"
           style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
         >
           Singularis
@@ -46,7 +46,7 @@ export default function Home() {
           className="text-center leading-relaxed text-white/65"
           style={{
             fontFamily: 'Cormorant Garamond, Georgia, serif',
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: 300,
             fontStyle: 'italic',
             letterSpacing: '0.01em',
@@ -79,7 +79,7 @@ export default function Home() {
         >
           <div className="h-px w-4 bg-white/[0.06]" />
           <p
-            className="text-[8px] tracking-[3px] uppercase text-white/[0.12]"
+            className="text-[7px] tracking-[3px] uppercase text-white/[0.10]"
             style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
           >
             Arthur Conan Doyle
