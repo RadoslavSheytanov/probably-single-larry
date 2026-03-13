@@ -67,7 +67,7 @@ export default function Home() {
           transition={{ delay: 0.35 + QUOTE_WORDS.length * 0.06 + 0.15, duration: 0.4 }}
         >
           <div className="h-px w-4 bg-white/[8%]" />
-          <p className="text-[7px] tracking-[3px] uppercase text-white/30">
+          <p className="text-[9px] tracking-[3px] uppercase text-white/30">
             Arthur Conan Doyle
           </p>
           <div className="h-px w-4 bg-white/[8%]" />
