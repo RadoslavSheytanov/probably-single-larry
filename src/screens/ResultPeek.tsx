@@ -51,11 +51,11 @@ export default function ResultPeek() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.6 }}
+      transition={{ duration: 0.3 }}
     >
       {/* Main content */}
       <motion.div
-        className="flex-1 flex flex-col items-center justify-center px-8"
+        className="flex-1 flex flex-col items-center justify-center px-6"
         initial={{ y: 30, scale: 0.94, opacity: 0 }}
         animate={{ y: 0, scale: 1, opacity: 1 }}
         transition={{ type: 'spring', damping: 25, stiffness: 120, mass: 0.8, delay: 0.15 }}
@@ -73,33 +73,30 @@ export default function ResultPeek() {
         </div>
 
         {/* Sign name */}
-        <p
-          className="uppercase text-white/40 mb-3 tracking-[10px]"
-          style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: 15, fontWeight: 300 }}
-        >
+        <p className="font-display text-[15px] uppercase text-white/50 mb-3 tracking-[10px]">
           {sign.name}
         </p>
 
         {/* Date */}
-        <p className="text-white mb-2" style={{ fontSize: 40, fontWeight: 100 }}>
+        <p className="text-white text-[40px] font-thin mb-2">
           {MONTH_NAMES[date.month - 1]} {date.day}
         </p>
 
         {/* Element + date range */}
-        <p className="text-white/15 text-xs tracking-widest uppercase mt-1">
+        <p className="text-white/[12%] text-xs tracking-widest uppercase mt-1">
           {sign.element} · {sign.dateRange}
         </p>
       </motion.div>
 
       {/* Action buttons */}
       <motion.div
-        className="flex flex-col gap-3 px-8 pb-safe-nav"
+        className="flex flex-col gap-3 px-6 pb-safe-nav"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
         <button
-          className="w-full py-4 rounded-2xl border border-white/10 text-white/50 text-sm tracking-[3px] uppercase font-light"
+          className="w-full py-4 rounded-2xl border border-white/[12%] text-white/50 text-sm tracking-[3px] uppercase font-light"
           onTouchStart={(e) => { e.preventDefault(); handleNewReading(); }}
           onClick={handleNewReading}
         >

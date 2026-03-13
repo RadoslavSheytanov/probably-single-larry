@@ -39,14 +39,13 @@ export default function LicenseGate({ onActivated }: Props) {
       className="fixed inset-0 flex flex-col bg-black"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.3 }}
     >
       {/* Branding */}
-      <div className="flex flex-col items-center pt-safe-header pb-2 px-8 mt-6">
+      <div className="flex flex-col items-center pt-safe-header pb-2 px-6 mt-6">
         <p className="text-[10px] tracking-[6px] uppercase text-white/20 mb-2">Singularis</p>
         <h1
-          className="text-4xl font-light tracking-widest uppercase text-white/70 mb-3"
-          style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}
+          className="font-display-upright text-4xl font-light tracking-widest uppercase text-white/70 mb-3"
         >
           Activate
         </h1>
@@ -56,7 +55,7 @@ export default function LicenseGate({ onActivated }: Props) {
       </div>
 
       {/* Inputs */}
-      <div className="flex-1 flex flex-col justify-center px-8 gap-3">
+      <div className="flex-1 flex flex-col justify-center px-6 gap-3">
         <input
           type="email"
           placeholder="your@email.com"
@@ -66,7 +65,7 @@ export default function LicenseGate({ onActivated }: Props) {
           autoCapitalize="none"
           autoCorrect="off"
           spellCheck={false}
-          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-4 text-white/70 text-sm placeholder-white/15 outline-none focus:border-white/20"
+          className="w-full bg-white/[4%] border border-white/[8%] rounded-xl px-4 py-4 text-white/70 text-sm placeholder-white/[12%] outline-none focus:border-white/20"
         />
         <input
           type="text"
@@ -77,7 +76,7 @@ export default function LicenseGate({ onActivated }: Props) {
           autoCapitalize="characters"
           autoCorrect="off"
           spellCheck={false}
-          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-4 text-white/70 text-sm font-mono placeholder-white/15 outline-none focus:border-white/20"
+          className="w-full bg-white/[4%] border border-white/[8%] rounded-xl px-4 py-4 text-white/70 text-sm font-mono placeholder-white/[12%] outline-none focus:border-white/20"
         />
 
         <AnimatePresence>
@@ -96,8 +95,7 @@ export default function LicenseGate({ onActivated }: Props) {
         </AnimatePresence>
 
         <motion.button
-          className="w-full py-4 rounded-2xl border border-white/10 text-white/70 text-sm tracking-[4px] uppercase font-light"
-          style={{ background: 'rgba(255,255,255,0.03)' }}
+          className="w-full py-4 rounded-2xl border border-white/[12%] text-white/70 text-sm tracking-[4px] uppercase font-light bg-white/[4%]"
           whileTap={loading ? {} : { scale: 0.97 }}
           onTouchStart={(e) => { e.preventDefault(); if (!loading) handleActivate(); }}
           onClick={() => { if (!loading) handleActivate(); }}
@@ -112,14 +110,14 @@ export default function LicenseGate({ onActivated }: Props) {
           href="https://gumroad.com/l/singularis"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-center text-white/15 text-xs tracking-widest uppercase"
+          className="text-center text-white/[12%] text-xs tracking-widest uppercase"
         >
           Purchase a license →
         </a>
       </div>
 
       <div className="pb-safe-nav pt-4 flex justify-center">
-        <p className="text-white/10 text-[10px] tracking-widest uppercase">Singularis v2.0.0</p>
+        <p className="text-white/[12%] text-[10px] tracking-widest uppercase">Singularis v2.0.0</p>
       </div>
     </motion.div>
   );

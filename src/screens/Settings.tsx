@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../state/store';
 import { getStoredEmail } from '../services/license';
+import ScreenHeader from '../components/ScreenHeader';
 
 function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   return (
     <button
-      className="relative flex-shrink-0"
-      style={{ width: 44, height: 26, borderRadius: 13, background: on ? 'rgba(255,159,10,0.7)' : 'rgba(255,255,255,0.08)' }}
+      className={`relative flex-shrink-0 rounded-full transition-colors ${on ? 'bg-amber-500/70' : 'bg-white/[8%]'}`}
+      style={{ width: 44, height: 26 }}
       onTouchStart={(e) => { e.preventDefault(); onToggle(); }}
       onClick={onToggle}
     >
@@ -23,7 +24,7 @@ function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between py-4 border-b border-white/[0.04]">
+    <div className="flex items-center justify-between py-4 border-b border-white/[4%]">
       <span className="text-white/50 text-sm font-light">{label}</span>
       {children}
     </div>
@@ -73,30 +74,27 @@ export default function Settings({ onDeactivate }: Props) {
       transition={{ type: 'spring', damping: 30, stiffness: 300 }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-6 pt-safe-header pb-4">
-        <h2
-          className="uppercase tracking-[6px] text-white/70 font-light"
-          style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: 22 }}
-        >
-          Settings
-        </h2>
-        <button
-          className="text-white/25 text-xs tracking-[3px] uppercase"
-          onTouchStart={(e) => { e.preventDefault(); handleClose(); }}
-          onClick={handleClose}
-        >
-          Close
-        </button>
-      </div>
+      <ScreenHeader
+        title="Settings"
+        rightElement={
+          <button
+            className="text-white/30 text-xs tracking-[3px] uppercase"
+            onTouchStart={(e) => { e.preventDefault(); handleClose(); }}
+            onClick={handleClose}
+          >
+            Close
+          </button>
+        }
+      />
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-6 pb-safe-nav">
 
         {/* ntfy Topic */}
-        <div className="py-4 border-b border-white/[0.04]">
+        <div className="py-4 border-b border-white/[4%]">
           <p className="text-white/50 text-sm font-light mb-2">ntfy Topic</p>
           <input
-            className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white/60 text-sm font-light placeholder-white/15 outline-none focus:border-white/20"
+            className="w-full bg-white/[4%] border border-white/[8%] rounded-xl px-4 py-3 text-white/70 text-sm font-light placeholder-white/[12%] outline-none focus:border-white/20"
             placeholder="your-secret-topic"
             value={ntfyInput}
             onChange={(e) => setNtfyInput(e.target.value)}
@@ -105,7 +103,7 @@ export default function Settings({ onDeactivate }: Props) {
             autoCorrect="off"
             spellCheck={false}
           />
-          <p className="text-white/15 text-xs mt-2">Used for watch notifications via ntfy.sh</p>
+          <p className="text-white/[12%] text-xs mt-2">Used for watch notifications via ntfy.sh</p>
         </div>
 
         <Row label="Haptic Feedback">
@@ -116,7 +114,7 @@ export default function Settings({ onDeactivate }: Props) {
         </Row>
 
         {/* Clear History */}
-        <div className="py-4 border-b border-white/[0.04]">
+        <div className="py-4 border-b border-white/[4%]">
           <AnimatePresence mode="wait">
             {confirmClear ? (
               <motion.button
@@ -148,11 +146,11 @@ export default function Settings({ onDeactivate }: Props) {
         </div>
 
         {/* License */}
-        <div className="py-4 border-b border-white/[0.04]">
+        <div className="py-4 border-b border-white/[4%]">
           <p className="text-white/50 text-sm font-light mb-2">License</p>
           {storedEmail ? (
             <>
-              <p className="text-white/25 text-xs mb-3">{storedEmail}</p>
+              <p className="text-white/30 text-xs mb-3">{storedEmail}</p>
               <button
                 className="text-xs tracking-wide font-light"
                 style={{ color: 'rgba(255,90,90,0.5)' }}
@@ -163,13 +161,13 @@ export default function Settings({ onDeactivate }: Props) {
               </button>
             </>
           ) : (
-            <p className="text-white/15 text-xs">Not activated</p>
+            <p className="text-white/[12%] text-xs">Not activated</p>
           )}
         </div>
 
         {/* Version */}
         <div className="py-4">
-          <p className="text-white/15 text-xs tracking-widest uppercase">
+          <p className="text-white/[12%] text-xs tracking-widest uppercase">
             Singularis v2.0.0 · PWA
           </p>
         </div>

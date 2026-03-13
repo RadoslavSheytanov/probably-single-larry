@@ -3,16 +3,19 @@
 @theme {
   --color-black: #000000;
   --color-surface: #0a0a0a;
-  --color-subtle: rgba(255, 255, 255, 0.04);
-  --color-muted: rgba(255, 255, 255, 0.08);
-  --color-dim: rgba(255, 255, 255, 0.15);
-  --color-soft: rgba(255, 255, 255, 0.25);
-  --color-text: rgba(255, 255, 255, 0.5);
-  --color-bright: rgba(255, 255, 255, 0.8);
-  --color-white: #ffffff;
+
   --color-amber: #FF9F0A;
+
   --color-warn: rgba(255, 180, 80, 0.6);
   --color-err: rgba(255, 90, 90, 0.5);
+
+  --color-subtle: rgba(255, 255, 255, 0.04);
+  --color-muted: rgba(255, 255, 255, 0.08);
+  --color-dim: rgba(255, 255, 255, 0.12);
+  --color-soft: rgba(255, 255, 255, 0.30);
+  --color-text: rgba(255, 255, 255, 0.50);
+  --color-bright: rgba(255, 255, 255, 0.80);
+  --color-white: #ffffff;
 
   --font-display: 'Cormorant Garamond', Georgia, serif;
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
@@ -22,34 +25,55 @@
   box-sizing: border-box;
 }
 
-/*
- * Safe-area base values — edit here to adjust all safe-area-aware classes.
- *   min-header: floor for pt-safe-header; 56px covers notch (~44px) + 12px gap
- *   min-nav:    floor for pb-safe-nav; 48px covers home indicator (~34px) + 14px gap
- *   min-abs:    floor for top-safe / bottom-safe absolute elements
- *   gap-flow:   extra gap added on top of the inset for flow-layout elements
- *   gap-abs:    extra gap for absolutely-positioned edge elements
- */
-:root {
-  --safe-min-header: 56px;
-  --safe-min-nav: 48px;
-  --safe-min-abs: 32px;
-  --safe-gap-flow: 16px;
-  --safe-gap-abs: 8px;
-}
-
 @layer utilities {
   .pt-safe-header {
-    padding-top: max(var(--safe-min-header), calc(env(safe-area-inset-top, 0px) + var(--safe-gap-flow)));
+    padding-top: max(56px, calc(env(safe-area-inset-top, 0px) + 16px));
   }
   .pb-safe-nav {
-    padding-bottom: max(var(--safe-min-nav), calc(env(safe-area-inset-bottom, 0px) + var(--safe-gap-flow)));
+    padding-bottom: max(48px, calc(env(safe-area-inset-bottom, 0px) + 16px));
   }
   .top-safe {
-    top: max(var(--safe-min-abs), calc(env(safe-area-inset-top, 0px) + var(--safe-gap-abs)));
+    top: max(32px, calc(env(safe-area-inset-top, 0px) + 8px));
   }
   .bottom-safe {
-    bottom: max(var(--safe-min-abs), calc(env(safe-area-inset-bottom, 0px) + var(--safe-gap-abs)));
+    bottom: max(32px, calc(env(safe-area-inset-bottom, 0px) + 8px));
+  }
+
+  /*
+   * .font-display — Cormorant Garamond italic weight 300.
+   * Use for the quote on Home and sign name on ResultPeek.
+   */
+  .font-display {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  /*
+   * .font-display-upright — Cormorant Garamond, not italic, weight 300.
+   * Use for screen heading titles (Settings, History, PracticeMode, LicenseGate).
+   */
+  .font-display-upright {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: normal;
+    font-weight: 300;
+  }
+
+  /*
+   * .font-ui — Inter weight 400.
+   * Replaces all inline style={{ fontFamily: 'Inter...' }} occurrences.
+   * Inter is already the global font — use this class only when an element
+   * inherits a different font-family (e.g. inside a .font-display container).
+   */
+  .font-ui {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-weight: 400;
+  }
+
+  /* .font-ui-light — Inter weight 300 */
+  .font-ui-light {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-weight: 300;
   }
 }
 
@@ -66,6 +90,7 @@ body,
   -webkit-tap-highlight-color: transparent;
   touch-action: none;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

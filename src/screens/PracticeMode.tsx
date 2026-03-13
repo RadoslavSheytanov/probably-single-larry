@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../state/store';
 import { compute } from '../engine/singularis';
 import { MONTH_NAMES, DAYS_IN_MONTH } from '../utils/constants';
+import ScreenHeader from '../components/ScreenHeader';
 
 function randomDate(): { day: number; month: number } {
   let day: number, month: number;
@@ -16,10 +17,7 @@ function randomDate(): { day: number; month: number } {
 
 function EdgeFlag({ label }: { label: string }) {
   return (
-    <span
-      className="text-xs tracking-wide px-2 py-0.5 rounded-md mr-2"
-      style={{ background: 'rgba(255,159,10,0.12)', color: 'rgba(255,159,10,0.7)' }}
-    >
+    <span className="text-xs tracking-wide px-2 py-0.5 rounded-md mr-2 bg-amber-500/[12%] text-amber-500/70">
       {label}
     </span>
   );
@@ -52,27 +50,24 @@ export default function PracticeMode() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 pt-safe-header pb-6">
-        <p
-          className="uppercase tracking-[6px] text-xs"
-          style={{ color: 'rgba(255,159,10,0.5)' }}
-        >
-          Drill Mode
-        </p>
-        <button
-          className="text-white/20 text-xs tracking-[3px] uppercase"
-          onTouchStart={(e) => { e.preventDefault(); setScreen('home'); }}
-          onClick={() => setScreen('home')}
-        >
-          Close
-        </button>
-      </div>
+      <ScreenHeader
+        title="Drill Mode"
+        titleClassName="font-display-upright uppercase tracking-[6px] text-sm text-amber-500/50"
+        rightElement={
+          <button
+            className="text-white/20 text-xs tracking-[3px] uppercase"
+            onTouchStart={(e) => { e.preventDefault(); setScreen('home'); }}
+            onClick={() => setScreen('home')}
+          >
+            Close
+          </button>
+        }
+      />
 
-      <div className="flex-1 flex flex-col items-center justify-center px-8">
+      <div className="flex-1 flex flex-col items-center justify-center px-6">
         {/* Target date */}
         <p className="text-white/20 text-[10px] tracking-[5px] uppercase mb-3">Target Date</p>
-        <p className="text-white font-light mb-1" style={{ fontSize: 52 }}>
+        <p className="text-white font-light mb-1 text-[52px]">
           {MONTH_NAMES[month - 1]} {day}
         </p>
         <p className="text-white/20 text-xs tracking-widest uppercase mb-10">
@@ -94,7 +89,7 @@ export default function PracticeMode() {
             {!revealed ? (
               <motion.button
                 key="reveal"
-                className="w-full py-4 rounded-2xl border border-white/10 text-white/40 text-sm tracking-[3px] uppercase font-light"
+                className="w-full py-4 rounded-2xl border border-white/[12%] text-white/50 text-sm tracking-[3px] uppercase font-light"
                 whileTap={{ scale: 0.97 }}
                 onTouchStart={(e) => { e.preventDefault(); setRevealed(true); }}
                 onClick={() => setRevealed(true)}
@@ -108,7 +103,7 @@ export default function PracticeMode() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="w-full rounded-2xl border border-white/[0.06] bg-white/[0.02] px-6 py-5"
+                className="w-full rounded-2xl border border-white/[8%] bg-white/[4%] px-6 py-5"
               >
                 {/* A and D */}
                 <div className="flex justify-around mb-5">
@@ -116,7 +111,7 @@ export default function PracticeMode() {
                     <p className="text-white/20 text-[10px] tracking-[4px] uppercase mb-1">A</p>
                     <p className="text-white text-3xl font-light">{A}</p>
                   </div>
-                  <div className="w-px bg-white/[0.06]" />
+                  <div className="w-px bg-white/[8%]" />
                   <div className="text-center">
                     <p className="text-white/20 text-[10px] tracking-[4px] uppercase mb-1">D</p>
                     <p className="text-white text-3xl font-light">{D}</p>
@@ -135,43 +130,43 @@ export default function PracticeMode() {
 
                 {/* Result */}
                 {result.kind === 'ok' && (
-                  <div className="flex items-center gap-3 pt-3 border-t border-white/[0.04]">
+                  <div className="flex items-center gap-3 pt-3 border-t border-white/[4%]">
                     <span className="text-3xl">{result.primary.sign.symbol}</span>
                     <div>
                       <p className="text-white/80 text-base font-light">
                         {MONTH_NAMES[result.primary.month - 1]} {result.primary.day}
                       </p>
-                      <p className="text-white/25 text-xs">{result.primary.sign.name}</p>
+                      <p className="text-white/30 text-xs">{result.primary.sign.name}</p>
                     </div>
                   </div>
                 )}
 
                 {result.kind === 'ambiguous' && (
-                  <div className="pt-3 border-t border-white/[0.04]">
+                  <div className="pt-3 border-t border-white/[4%]">
                     <div className="flex items-center gap-3 mb-3">
                       <span className="text-3xl">{result.primary.sign.symbol}</span>
                       <div>
                         <p className="text-white/80 text-base font-light">
                           {MONTH_NAMES[result.primary.month - 1]} {result.primary.day}
                         </p>
-                        <p className="text-white/25 text-xs">{result.primary.sign.name}</p>
+                        <p className="text-white/30 text-xs">{result.primary.sign.name}</p>
                       </div>
                     </div>
-                    <p className="text-white/15 text-xs tracking-widest uppercase mb-3">or</p>
+                    <p className="text-white/[12%] text-xs tracking-widest uppercase mb-3">or</p>
                     <div className="flex items-center gap-3">
                       <span className="text-3xl">{result.alternate.sign.symbol}</span>
                       <div>
                         <p className="text-white/80 text-base font-light">
                           {MONTH_NAMES[result.alternate.month - 1]} {result.alternate.day}
                         </p>
-                        <p className="text-white/25 text-xs">{result.alternate.sign.name}</p>
+                        <p className="text-white/30 text-xs">{result.alternate.sign.name}</p>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {result.kind === 'error' && (
-                  <p className="text-xs pt-3 border-t border-white/[0.04]" style={{ color: 'rgba(255,90,90,0.6)' }}>
+                  <p className="text-xs pt-3 border-t border-white/[4%]" style={{ color: 'rgba(255,90,90,0.6)' }}>
                     Error: {result.reason.replace(/_/g, ' ')}
                   </p>
                 )}
@@ -182,10 +177,9 @@ export default function PracticeMode() {
       </div>
 
       {/* Next Date */}
-      <div className="px-8 pb-safe-nav pt-4">
+      <div className="px-6 pb-safe-nav pt-4">
         <motion.button
-          className="w-full py-4 rounded-2xl border text-sm tracking-[3px] uppercase font-light"
-          style={{ borderColor: 'rgba(255,159,10,0.3)', color: 'rgba(255,159,10,0.6)' }}
+          className="w-full py-4 rounded-2xl border border-amber-500/30 text-amber-500/50 text-sm tracking-[3px] uppercase font-light"
           whileTap={{ scale: 0.97 }}
           onTouchStart={(e) => { e.preventDefault(); nextDate(); }}
           onClick={nextDate}

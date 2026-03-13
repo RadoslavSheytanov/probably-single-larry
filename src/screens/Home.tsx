@@ -27,31 +27,20 @@ export default function Home() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
+      transition={{ duration: 0.3 }}
     >
       {/* Header */}
-      <div className="flex flex-col items-center pt-safe-header px-8 pb-0">
-        <p
-          className="text-[9px] tracking-[8px] uppercase text-white/30"
-          style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
-        >
+      <div className="flex flex-col items-center pt-safe-header px-6 pb-0">
+        <p className="text-[9px] tracking-[8px] uppercase text-white/30">
           Singularis
         </p>
-        <div className="mt-5 w-10 border-t border-white/[0.09]" />
+        <div className="mt-5 w-10 border-t border-white/[8%]" />
       </div>
 
       {/* Quote — hero element */}
-      <div className="flex flex-col items-center justify-center px-10 pt-12 pb-6">
+      <div className="flex flex-col items-center justify-center px-6 pt-12 pb-6">
         <p
-          className="text-center leading-relaxed text-white/65"
-          style={{
-            fontFamily: 'Cormorant Garamond, Georgia, serif',
-            fontSize: 20,
-            fontWeight: 300,
-            fontStyle: 'italic',
-            letterSpacing: '0.01em',
-            lineHeight: 1.65,
-          }}
+          className="font-display text-[20px] leading-[1.65] tracking-[0.01em] text-center text-white/70"
           aria-label={QUOTE}
         >
           {QUOTE_WORDS.map((word, i) => (
@@ -77,36 +66,27 @@ export default function Home() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.35 + QUOTE_WORDS.length * 0.06 + 0.15, duration: 0.4 }}
         >
-          <div className="h-px w-4 bg-white/[0.06]" />
-          <p
-            className="text-[7px] tracking-[3px] uppercase text-white/[0.10]"
-            style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
-          >
+          <div className="h-px w-4 bg-white/[8%]" />
+          <p className="text-[7px] tracking-[3px] uppercase text-white/[12%]">
             Arthur Conan Doyle
           </p>
-          <div className="h-px w-4 bg-white/[0.06]" />
+          <div className="h-px w-4 bg-white/[8%]" />
         </motion.div>
       </div>
 
       {/* Status cards */}
-      <div className="px-5 flex flex-col gap-2">
+      <div className="px-6 flex flex-col gap-2">
         {lastReading && (
           <motion.div
-            className="px-5 py-4 rounded-2xl border border-white/[0.07] bg-white/[0.035]"
+            className="px-5 py-4 rounded-2xl border border-white/[8%] bg-white/[4%]"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.4, ease: WORD_EASE }}
           >
-            <p
-              className="text-[9px] tracking-[4px] uppercase text-white/25 mb-1.5"
-              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
-            >
+            <p className="text-[9px] tracking-[4px] uppercase text-white/30 mb-1.5">
               Last reading
             </p>
-            <p
-              className="text-white/60 text-[15px]"
-              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300 }}
-            >
+            <p className="font-light text-white/70 text-[15px]">
               {lastReadingLabel()}
             </p>
           </motion.div>
@@ -114,15 +94,12 @@ export default function Home() {
 
         {!ntfyConfigured && (
           <motion.div
-            className="px-5 py-3.5 rounded-2xl border border-amber-500/20 bg-amber-500/[0.05]"
+            className="px-5 py-3.5 rounded-2xl border border-amber-500/20 bg-amber-500/[4%]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.55, duration: 0.4 }}
           >
-            <p
-              className="text-[11px] text-amber-500/60"
-              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300 }}
-            >
+            <p className="font-light text-[11px] text-amber-500/50">
               ntfy topic not configured — watch notifications disabled
             </p>
           </motion.div>
@@ -132,13 +109,8 @@ export default function Home() {
       {/* Action buttons */}
       <div className="flex-1 flex flex-col items-center justify-end gap-2.5 px-6 pb-4">
         <motion.button
-          className="w-full py-[18px] rounded-2xl border border-white/[0.14] text-white/80 text-xs tracking-[5px] uppercase active:bg-white/[0.06]"
-          style={{
-            background: 'rgba(255,255,255,0.05)',
-            fontFamily: 'Inter, sans-serif',
-            fontWeight: 400,
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
-          }}
+          className="w-full py-[18px] rounded-2xl border border-white/[8%] bg-white/[4%] text-white/80 text-xs tracking-[5px] uppercase active:bg-white/[8%]"
+          style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' }}
           whileTap={{ scale: 0.97 }}
           onTouchStart={(e) => { e.preventDefault(); setScreen('stealth'); }}
           onClick={() => setScreen('stealth')}
@@ -150,8 +122,7 @@ export default function Home() {
         </motion.button>
 
         <motion.button
-          className="w-full py-[14px] rounded-2xl border border-white/[0.08] text-white/35 text-xs tracking-[4px] uppercase active:bg-white/[0.02]"
-          style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300 }}
+          className="font-light w-full py-[14px] rounded-2xl border border-white/[8%] text-white/30 text-xs tracking-[4px] uppercase active:bg-white/[4%]"
           whileTap={{ scale: 0.97 }}
           onTouchStart={(e) => { e.preventDefault(); setScreen('practice'); }}
           onClick={() => setScreen('practice')}
@@ -164,9 +135,9 @@ export default function Home() {
       </div>
 
       {/* Bottom nav */}
-      <div className="flex items-center justify-between px-10 pb-safe-nav pt-3 border-t border-white/[0.06]">
+      <div className="flex items-center justify-between px-6 pb-safe-nav pt-3 border-t border-white/[8%]">
         <motion.button
-          className="flex flex-col items-center gap-1.5 text-white/25 active:text-white/55"
+          className="flex flex-col items-center gap-1.5 text-white/30 active:text-white/50"
           whileTap={{ scale: 0.92 }}
           onTouchStart={(e) => { e.preventDefault(); setScreen('history'); }}
           onClick={() => setScreen('history')}
@@ -175,16 +146,13 @@ export default function Home() {
           transition={{ delay: 0.75, duration: 0.4 }}
         >
           <span className="text-lg">◷</span>
-          <span
-            className="text-[8px] tracking-[2.5px] uppercase"
-            style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
-          >
+          <span className="text-[8px] tracking-[2.5px] uppercase">
             History
           </span>
         </motion.button>
 
         <motion.button
-          className="flex flex-col items-center gap-1.5 text-white/25 active:text-white/55"
+          className="flex flex-col items-center gap-1.5 text-white/30 active:text-white/50"
           whileTap={{ scale: 0.92 }}
           onTouchStart={(e) => { e.preventDefault(); setScreen('settings'); }}
           onClick={() => setScreen('settings')}
@@ -193,10 +161,7 @@ export default function Home() {
           transition={{ delay: 0.75, duration: 0.4 }}
         >
           <span className="text-lg">⚙</span>
-          <span
-            className="text-[8px] tracking-[2.5px] uppercase"
-            style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
-          >
+          <span className="text-[8px] tracking-[2.5px] uppercase">
             Settings
           </span>
         </motion.button>

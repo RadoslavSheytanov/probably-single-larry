@@ -183,7 +183,7 @@ export default function StealthInput() {
             </div>
 
             {/* Hairline divider */}
-            <div className="w-full" style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} />
+            <div className="w-full h-px bg-white/[8%]" />
 
             {/* Bottom half — later date */}
             <div className="flex-1 flex items-center justify-center">
