@@ -181,15 +181,20 @@ Set in `.env.production` (gitignored). For local dev use `.env` or `.env.local`.
   - ntfy format: Title = sign name, Body = "December 6" or "December 6 or January 15"
 - Home screen: Inter font added, word-by-word animated quote reveal (Framer Motion stagger)
 - End-to-end tested: engine, ntfy push to iPhone confirmed working
-- P0–P3 polish pass complete (commit 11f129a on develop):
+- P0–P3 polish pass complete (commits 11f129a, 0d539b0 on develop):
   - useStealthInput: haptic gating via hapticFeedback setting; opts→stable refs (no listener re-attach);
     swipe guards block exit/back during RESOLVING; onTap callback for per-tap flash
   - StealthInput: ordinal via DAYS_BEFORE_MONTH table; RESOLVE_GUARD_MS = LONG_PRESS_MS+200;
-    hasResolvedRef double-send guard; ResolvedDateLabel fully in Tailwind
+    hasResolvedRef double-send guard; ResolvedDateLabel fully in Tailwind;
+    practice button min 44×44px touch target; wake lock isActive=()=>true documented
   - DOUBLE_TAP_MS reduced 300→150ms (prevents rhythm taps triggering undo)
-  - LicenseGate: 15s timeout, error color unified to rgba(255,90,90,0.6)
-  - Settings: haptic feedback before destructive actions, confirm timeout 3000→2000ms
-  - ResultPeek: whileTap scale on action buttons
+  - LicenseGate: 15s timeout; error color unified; form semantics (onSubmit, aria-labels,
+    type=submit); button opacity-50 + pointer-events-none while loading
+  - Settings: haptic feedback before destructive actions; confirm timeout 3000→2000ms;
+    clearHistory timeout tracked in ref (no unmounted-state-update warning);
+    Toggle has role=switch + aria-checked + aria-label
+  - ResultPeek: whileTap scale on action buttons; recording effect dep comment
+  - History: ul/li semantic structure for screen reader list traversal
   - History: fade-in animation on empty state
   - PWA manifest: added purpose:'any' icon entry alongside maskable
   - index.css: removed unused .font-ui-light utility class
