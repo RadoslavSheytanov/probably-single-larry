@@ -166,7 +166,7 @@ export default function PracticeMode() {
                 )}
 
                 {result.kind === 'error' && (
-                  <p className="text-xs pt-3 border-t border-white/[4%]" style={{ color: 'rgba(255,90,90,0.6)' }}>
+                  <p className="text-xs pt-3 border-t border-white/[4%] text-err">
                     Error: {result.reason.replace(/_/g, ' ')}
                   </p>
                 )}

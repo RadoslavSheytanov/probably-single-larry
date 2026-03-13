@@ -98,8 +98,7 @@ export default function LicenseGate({ onActivated }: Props) {
             {error && (
               <motion.p
                 key="err"
-                className="text-xs text-center px-4 leading-relaxed"
-                style={{ color: 'rgba(255,90,90,0.6)' }}
+                className="text-xs text-center px-4 leading-relaxed text-err"
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}

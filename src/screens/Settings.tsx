@@ -139,8 +139,7 @@ export default function Settings({ onDeactivate }: Props) {
             {confirmClear ? (
               <motion.button
                 key="confirm"
-                className="text-sm font-light tracking-wide"
-                style={{ color: 'rgba(255,90,90,0.6)' }}
+                className="text-sm font-light tracking-wide text-err"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -172,8 +171,7 @@ export default function Settings({ onDeactivate }: Props) {
             <>
               <p className="text-white/30 text-xs mb-3">{storedEmail}</p>
               <button
-                className="text-xs tracking-wide font-light"
-                style={{ color: 'rgba(255,90,90,0.6)' }}
+                className="text-xs tracking-wide font-light text-err"
                 onTouchStart={(e) => { e.preventDefault(); haptics.error(); onDeactivate?.(); }}
                 onClick={() => { haptics.error(); onDeactivate?.(); }}
               >

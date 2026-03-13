@@ -19,8 +19,7 @@ export default function PhaseIndicator({ phase }: Props) {
         return (
           <motion.div
             key={p}
-            className="rounded-full"
-            style={{ width: 4, height: 4 }}
+            className="w-1 h-1 rounded-full"
             animate={{
               opacity: isActive ? 0.25 : isPast ? 0.10 : 0.06,
               boxShadow: isActive
