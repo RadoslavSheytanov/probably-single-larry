@@ -9,6 +9,7 @@ import { MONTH_NAMES } from '../utils/constants';
 
 export default function StealthInput() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const resolvingAt = useRef<number>(0);
   const store = useStore();
   const phase = useStore((s) => s.stealth.phase);
   const anchorValue = useStore((s) => s.stealth.anchorValue);
@@ -79,7 +80,8 @@ export default function StealthInput() {
   }, [store, settings.ntfyTopic, setScreen]);
 
   const handleAmbiguous = useCallback(() => {
-    // Stay in RESOLVING phase — ntfy fires only after performer confirms the date
+    // Stamp when we entered RESOLVING so the finger-lift from the long press is ignored
+    resolvingAt.current = Date.now();
   }, []);
 
   // Wrap handleTap to also trigger flash — we intercept via a custom wrapper
@@ -98,9 +100,12 @@ export default function StealthInput() {
   useStealthInput(containerRef as React.RefObject<HTMLElement | null>, stealthOpts);
 
   // Resolve ambiguous via top/bottom tap when in RESOLVING phase
+  // Guard: ignore the finger-lift from the long press that triggered RESOLVING
+  const RESOLVE_GUARD_MS = 800;
   function handleResolveTap(e: React.TouchEvent | React.MouseEvent) {
     if (phase !== 'RESOLVING') return;
     if (engineResult?.kind !== 'ambiguous') return;
+    if (Date.now() - resolvingAt.current < RESOLVE_GUARD_MS) return;
 
     const clientY = 'touches' in e
       ? (e as React.TouchEvent).changedTouches?.[0]?.clientY ?? 0
