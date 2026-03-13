@@ -4,6 +4,10 @@ import { MONTH_NAMES } from '../utils/constants';
 import type { Reading } from '../utils/types';
 import ScreenHeader from '../components/ScreenHeader';
 
+function textSymbol(symbol: string): string {
+  return `${symbol}\uFE0E`;
+}
+
 function HistoryEntry({ reading }: { reading: Reading }) {
   const date = reading.resolvedDate;
   if (!date) return null;
@@ -11,13 +15,13 @@ function HistoryEntry({ reading }: { reading: Reading }) {
   const { day, month, sign } = date;
 
   return (
-    <li className="flex items-center py-4 border-b border-white/[4%] list-none">
-      <span className="text-3xl mr-4 leading-none">{sign.symbol}</span>
+    <li className="flex items-center py-4 border-b border-white/[5%] list-none last:border-b-0">
+      <span className="text-[30px] mr-4 leading-none text-white/42">{textSymbol(sign.symbol)}</span>
       <div className="flex-1 min-w-0">
-        <p className="text-white/80 text-base font-light">
+        <p className="text-white/84 text-base font-light">
           {MONTH_NAMES[month - 1]} {day}
         </p>
-        <p className="text-white/30 text-xs mt-0.5">
+        <p className="text-white/32 text-xs mt-1">
           {new Date(reading.timestamp).toLocaleDateString(undefined, {
             month: 'short',
             day: 'numeric',
@@ -25,7 +29,7 @@ function HistoryEntry({ reading }: { reading: Reading }) {
           })}
         </p>
       </div>
-      <p className="text-white/30 text-xs tracking-wide ml-3 text-right flex-shrink-0">
+      <p className="text-white/36 text-xs tracking-[2px] uppercase ml-3 text-right flex-shrink-0">
         {sign.name}
       </p>
     </li>
@@ -48,7 +52,7 @@ export default function History() {
         title="History"
         rightElement={
           <button
-            className="text-white/30 text-xs tracking-[3px] uppercase"
+            className="text-white/34 text-[11px] tracking-[3px] uppercase"
             onTouchStart={(e) => { e.preventDefault(); setScreen('home'); }}
             onClick={() => setScreen('home')}
           >
@@ -57,7 +61,6 @@ export default function History() {
         }
       />
 
-      {/* List */}
       <div className="flex-1 overflow-y-auto px-6 pb-safe-nav">
         {history.length === 0 ? (
           <motion.div
@@ -66,21 +69,23 @@ export default function History() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <p className="text-white/[12%] text-sm tracking-widest uppercase">No readings yet</p>
+            <p className="text-white/[16%] text-[10px] tracking-[4px] uppercase mb-3">History</p>
+            <p className="text-white/[28%] text-sm tracking-[3px] uppercase">No readings yet</p>
           </motion.div>
         ) : (
-          <ul className="list-none p-0 m-0">
-            {history.map((reading) => (
-              <HistoryEntry key={reading.id} reading={reading} />
-            ))}
-          </ul>
+          <div className="rounded-[24px] border border-white/[8%] bg-black/20 px-5">
+            <ul className="list-none p-0 m-0">
+              {history.map((reading) => (
+                <HistoryEntry key={reading.id} reading={reading} />
+              ))}
+            </ul>
+          </div>
         )}
       </div>
 
-      {/* Entry count */}
       {history.length > 0 && (
-        <div className="px-6 pb-8 pt-2">
-          <p className="text-white/[12%] text-xs tracking-widest uppercase text-center">
+        <div className="px-6 pb-8 pt-3">
+          <p className="text-white/[16%] text-[10px] tracking-[4px] uppercase text-center">
             {history.length} reading{history.length !== 1 ? 's' : ''}
           </p>
         </div>

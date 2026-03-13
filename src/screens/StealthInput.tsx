@@ -7,6 +7,7 @@ import { ntfySend } from '../services/ntfy';
 import { haptics } from '../services/haptics';
 import { acquireWakeLock, releaseWakeLock, setupWakeLockReacquire } from '../services/wakeLock';
 import { MONTH_NAMES, LONG_PRESS_MS } from '../utils/constants';
+import type { EngineResult } from '../utils/types';
 
 // Correct ordinal using cumulative days — avoids fragile month*31+day formula
 const DAYS_BEFORE_MONTH = [0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334] as const;
@@ -14,9 +15,15 @@ function dateOrd(month: number, day: number): number {
   return DAYS_BEFORE_MONTH[month] + day;
 }
 
+function textSymbol(symbol: string): string {
+  return `${symbol}\uFE0E`;
+}
+
 // Guard: ignore finger-lift from the long press that triggers RESOLVING.
 // Must be slightly longer than LONG_PRESS_MS so the lift is always absorbed.
 const RESOLVE_GUARD_MS = LONG_PRESS_MS + 200;
+type OkResult = Extract<EngineResult, { kind: 'ok' }>;
+type AmbiguousResult = Extract<EngineResult, { kind: 'ambiguous' }>;
 
 export default function StealthInput() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -84,15 +91,14 @@ export default function StealthInput() {
     setShowWarning(true);
   }, []);
 
-  const handleResult = useCallback(() => {
-    const result = store.stealth.engineResult;
-    if (result?.kind === 'ok') {
+  const handleResult = useCallback((result: OkResult) => {
+    if (settings.ntfyEnabled) {
       ntfySend(settings.ntfyTopic, result.primary, null);
     }
     setScreen('result');
-  }, [store, settings.ntfyTopic, setScreen]);
+  }, [settings.ntfyEnabled, settings.ntfyTopic, setScreen]);
 
-  const handleAmbiguous = useCallback(() => {
+  const handleAmbiguous = useCallback((_result: AmbiguousResult) => {
     // Stamp entry time so finger-lift from the long press is ignored
     resolvingAt.current = Date.now();
     // Reset double-send guard for this resolution session
@@ -130,7 +136,9 @@ export default function StealthInput() {
     hasResolvedRef.current = true;
     haptics.resolved();
     store.resolveAmbiguous(chosen);
-    ntfySend(settings.ntfyTopic, chosen, null);
+    if (settings.ntfyEnabled) {
+      ntfySend(settings.ntfyTopic, chosen, null);
+    }
     setScreen('result');
   }
 
@@ -203,27 +211,6 @@ export default function StealthInput() {
         <PhaseIndicator phase={phase} />
       </div>
 
-      {/* Practice mode shortcut (top-right, very subtle) */}
-      <button
-        className="absolute top-safe right-6 text-white/15 text-xs tracking-widest uppercase min-h-[44px] min-w-[44px] flex items-center justify-center"
-        style={{ touchAction: 'none' }}
-        onTouchStart={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-        onTouchEnd={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          setScreen('practice');
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          setScreen('practice');
-        }}
-      >
-        ◎
-      </button>
-
       {/* Warning overlay */}
       <AnimatePresence>
         {showWarning && (
@@ -263,11 +250,11 @@ export default function StealthInput() {
 function ResolvedDateLabel({ date }: { date: { day: number; month: number; sign: { name: string; symbol: string } } }) {
   return (
     <div className="text-center opacity-55">
-      <div className="text-white text-[28px] leading-none mb-2">{date.sign.symbol}</div>
+      <div className="text-white text-[28px] leading-none mb-2">{textSymbol(date.sign.symbol)}</div>
       <div className="text-white text-[32px] font-thin tracking-wide">
         {MONTH_NAMES[date.month - 1]} {date.day}
       </div>
-      <div className="text-white/40 uppercase tracking-widest text-[11px] font-light mt-1.5">
+      <div className="font-display-upright text-white/46 uppercase tracking-[4px] text-[14px] mt-2">
         {date.sign.name}
       </div>
     </div>

@@ -41,7 +41,7 @@
 
   /*
    * .font-display — Cormorant Garamond italic weight 300.
-   * Use for the quote on Home and sign name on ResultPeek.
+   * Use only for editorial moments like the Home quote.
    */
   .font-display {
     font-family: 'Cormorant Garamond', Georgia, serif;
@@ -51,7 +51,7 @@
 
   /*
    * .font-display-upright — Cormorant Garamond, not italic, weight 300.
-   * Use for screen heading titles (Settings, History, PracticeMode, LicenseGate).
+   * Use for brand-facing titles, headings, and refined labels across the app.
    */
   .font-display-upright {
     font-family: 'Cormorant Garamond', Georgia, serif;

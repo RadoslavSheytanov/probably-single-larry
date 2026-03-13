@@ -8,7 +8,6 @@ import StealthInput from './screens/StealthInput';
 import ResultPeek from './screens/ResultPeek';
 import Settings from './screens/Settings';
 import History from './screens/History';
-import PracticeMode from './screens/PracticeMode';
 import Instructions from './screens/Instructions';
 
 type AuthState = 'checking' | 'active' | 'needs-auth';
@@ -47,7 +46,6 @@ export default function App() {
       {screen === 'result' && <ResultPeek key="result" />}
       {screen === 'settings' && <Settings key="settings" onDeactivate={handleDeactivate} />}
       {screen === 'history' && <History key="history" />}
-      {screen === 'practice' && <PracticeMode key="practice" />}
       {screen === 'instructions' && <Instructions key="instructions" />}
     </AnimatePresence>
   );

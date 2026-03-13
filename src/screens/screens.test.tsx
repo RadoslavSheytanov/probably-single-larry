@@ -46,8 +46,8 @@ import React from 'react';
 import { useStore } from '../state/store';
 import Home from './Home';
 import History from './History';
-import PracticeMode from './PracticeMode';
 import ResultPeek from './ResultPeek';
+import Settings from './Settings';
 import type { ResolvedDate } from '../utils/types';
 
 const CLEAN_STEALTH = {
@@ -63,7 +63,7 @@ const CLEAN_STATE = {
   screen: 'home' as const,
   stealth: CLEAN_STEALTH,
   history: [] as ReturnType<typeof useStore.getState>['history'],
-  settings: { ntfyTopic: '', hapticFeedback: true },
+  settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true },
 };
 
 const CANCER_DATE: ResolvedDate = {
@@ -85,14 +85,9 @@ beforeEach(() => {
 // ─── Home ─────────────────────────────────────────────────────────────────────
 
 describe('Home screen', () => {
-  it('renders "Start Performance" button', () => {
+  it('renders primary action button', () => {
     render(<Home />);
-    expect(screen.getByText('Start Performance')).toBeInTheDocument();
-  });
-
-  it('renders "Practice" button', () => {
-    render(<Home />);
-    expect(screen.getByText('Practice')).toBeInTheDocument();
+    expect(screen.getByText('Configure Notifications')).toBeInTheDocument();
   });
 
   it('renders "History" nav button', () => {
@@ -102,7 +97,7 @@ describe('Home screen', () => {
 
   it('renders "Guide" nav button', () => {
     render(<Home />);
-    expect(screen.getByText('Guide')).toBeInTheDocument();
+    expect(screen.getAllByText('Guide').length).toBeGreaterThan(0);
   });
 
   it('renders "Settings" nav button', () => {
@@ -136,7 +131,7 @@ describe('Home screen', () => {
       ],
     });
     render(<Home />);
-    expect(screen.getByText('Last reading')).toBeInTheDocument();
+    expect(screen.getAllByText('Last reading').length).toBeGreaterThan(0);
     expect(screen.getByText(/Cancer/)).toBeInTheDocument();
     expect(screen.getByText(/July.*17|17.*July/)).toBeInTheDocument();
   });
@@ -144,18 +139,50 @@ describe('Home screen', () => {
   it('when ntfyTopic is empty, shows warning message', () => {
     render(<Home />);
     expect(
-      screen.getByText(/ntfy topic not configured/i)
+      screen.getByText(/watch delivery is still offline/i)
     ).toBeInTheDocument();
   });
 
   it('does not show ntfy warning when ntfyTopic is set', () => {
     useStore.setState({
-      settings: { ntfyTopic: 'my-topic', hapticFeedback: true },
+      settings: { ntfyTopic: 'my-topic', ntfyEnabled: true, hapticFeedback: true },
     });
     render(<Home />);
     expect(
-      screen.queryByText(/ntfy topic not configured/i)
+      screen.queryByText(/watch delivery is still offline/i)
     ).not.toBeInTheDocument();
+  });
+
+  it('routes primary action to settings when ntfyTopic is empty', () => {
+    render(<Home />);
+    fireEvent.click(screen.getByText('Configure Notifications'));
+    expect(useStore.getState().screen).toBe('settings');
+  });
+
+  it('routes primary action to stealth when ntfyTopic is configured', () => {
+    useStore.setState({
+      settings: { ntfyTopic: 'my-topic', ntfyEnabled: true, hapticFeedback: true },
+    });
+    render(<Home />);
+    fireEvent.click(screen.getByText('Start Performance'));
+    expect(useStore.getState().screen).toBe('stealth');
+  });
+
+  it('does not show ntfy warning when push notifications are disabled', () => {
+    useStore.setState({
+      settings: { ntfyTopic: '', ntfyEnabled: false, hapticFeedback: true },
+    });
+    render(<Home />);
+    expect(screen.queryByText(/watch delivery is still offline/i)).not.toBeInTheDocument();
+  });
+
+  it('routes primary action to stealth when push notifications are disabled', () => {
+    useStore.setState({
+      settings: { ntfyTopic: '', ntfyEnabled: false, hapticFeedback: true },
+    });
+    render(<Home />);
+    fireEvent.click(screen.getByText('Start Performance'));
+    expect(useStore.getState().screen).toBe('stealth');
   });
 });
 
@@ -194,7 +221,7 @@ describe('History screen', () => {
       ],
     });
     render(<History />);
-    expect(screen.getByText('♋')).toBeInTheDocument();
+    expect(screen.getByText('♋︎')).toBeInTheDocument();
     expect(screen.getByText(/July.*17|July 17/)).toBeInTheDocument();
     expect(screen.getByText('Cancer')).toBeInTheDocument();
   });
@@ -208,49 +235,25 @@ describe('History screen', () => {
   });
 });
 
-// ─── PracticeMode ─────────────────────────────────────────────────────────────
+// ─── Settings ─────────────────────────────────────────────────────────────────
 
-describe('PracticeMode screen', () => {
-  it('renders "Target Date" label', () => {
-    render(<PracticeMode />);
-    expect(screen.getByText('Target Date')).toBeInTheDocument();
+describe('Settings screen', () => {
+  it('toggles push notifications setting from on to off', () => {
+    useStore.setState({
+      settings: { ntfyTopic: 'my-topic', ntfyEnabled: true, hapticFeedback: true },
+    });
+    render(<Settings />);
+    fireEvent.click(screen.getByLabelText('Toggle push notifications'));
+    expect(useStore.getState().settings.ntfyEnabled).toBe(false);
   });
 
-  it('renders "Reveal Answer" button initially', () => {
-    render(<PracticeMode />);
-    expect(screen.getByText('Reveal Answer')).toBeInTheDocument();
-  });
-
-  it('after clicking "Reveal Answer", shows A and D labels', () => {
-    render(<PracticeMode />);
-    fireEvent.click(screen.getByText('Reveal Answer'));
-    // A and D column headers appear
-    expect(screen.getByText('A')).toBeInTheDocument();
-    expect(screen.getByText('D')).toBeInTheDocument();
-  });
-
-  it('after clicking "Reveal Answer", shows the calculated result', () => {
-    const { container } = render(<PracticeMode />);
-    fireEvent.click(screen.getByText('Reveal Answer'));
-    // The calculation steps appear — text is split across spans by JSX interpolation,
-    // so check the container's full text content rather than a single element match.
-    expect(container.textContent).toMatch(/A − D/);
-    expect(container.textContent).toMatch(/\/ 2/);
-  });
-
-  it('clicking "Next Date" resets view (Reveal Answer reappears)', () => {
-    render(<PracticeMode />);
-    // Reveal first
-    fireEvent.click(screen.getByText('Reveal Answer'));
-    expect(screen.queryByText('Reveal Answer')).not.toBeInTheDocument();
-    // Next date resets
-    fireEvent.click(screen.getByText('Next Date'));
-    expect(screen.getByText('Reveal Answer')).toBeInTheDocument();
-  });
-
-  it('renders "Next Date" button', () => {
-    render(<PracticeMode />);
-    expect(screen.getByText('Next Date')).toBeInTheDocument();
+  it('toggles haptic feedback setting from on to off', () => {
+    useStore.setState({
+      settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true },
+    });
+    render(<Settings />);
+    fireEvent.click(screen.getByLabelText('Toggle haptic feedback'));
+    expect(useStore.getState().settings.hapticFeedback).toBe(false);
   });
 });
 
@@ -272,12 +275,12 @@ describe('ResultPeek screen', () => {
 
   it('renders sign symbol', () => {
     render(<ResultPeek />);
-    expect(screen.getByText('♋')).toBeInTheDocument();
+    expect(screen.getByText('♋︎')).toBeInTheDocument();
   });
 
   it('renders sign name', () => {
     render(<ResultPeek />);
-    expect(screen.getByText('Cancer')).toBeInTheDocument();
+    expect(screen.getAllByText('Cancer').length).toBeGreaterThan(0);
   });
 
   it('renders formatted date (e.g. "July 17")', () => {

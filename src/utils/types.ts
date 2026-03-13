@@ -1,6 +1,6 @@
 export type Phase = 'ANCHOR' | 'DIFFERENCE' | 'COMPUTED' | 'RESOLVING';
 
-export type Screen = 'home' | 'stealth' | 'result' | 'settings' | 'history' | 'practice' | 'instructions';
+export type Screen = 'home' | 'stealth' | 'result' | 'settings' | 'history' | 'instructions';
 
 
 export interface StarSign {
@@ -30,5 +30,6 @@ export interface Reading {
 
 export interface AppSettings {
   ntfyTopic: string;
+  ntfyEnabled: boolean;
   hapticFeedback: boolean;
 }

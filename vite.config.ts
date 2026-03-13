@@ -11,9 +11,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png'],
       manifest: {
-        name: 'Calculator',
-        short_name: 'Calc',
-        description: 'Calculator',
+        name: 'Singularis',
+        short_name: 'Singularis',
+        description: 'Singularis',
         start_url: '/',
         display: 'standalone',
         orientation: 'portrait',

@@ -3,13 +3,16 @@ import { useStore } from '../state/store';
 import { haptics } from '../services/haptics';
 import { compute } from '../engine/singularis';
 import { LONG_PRESS_MS, DOUBLE_TAP_MS } from '../utils/constants';
-import type { Phase } from '../utils/types';
+import type { EngineResult, Phase } from '../utils/types';
+
+type OkResult = Extract<EngineResult, { kind: 'ok' }>;
+type AmbiguousResult = Extract<EngineResult, { kind: 'ambiguous' }>;
 
 interface Options {
   onAnchorTooLow?: () => void;
   onError?: (reason: string) => void;
-  onResult?: () => void;
-  onAmbiguous?: () => void;
+  onResult?: (result: OkResult) => void;
+  onAmbiguous?: (result: AmbiguousResult) => void;
   onExit?: () => void;
   onGoBack?: () => void;
   /** Called on every single tap — use for flash/visual feedback */
@@ -113,10 +116,10 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
 
       if (result.kind === 'ambiguous') {
         h(() => haptics.ambiguous());
-        onAmbiguousRef.current?.();
+        onAmbiguousRef.current?.(result);
       } else {
         h(() => haptics.result());
-        onResultRef.current?.();
+        onResultRef.current?.(result);
       }
     }
   }, [store, h]);

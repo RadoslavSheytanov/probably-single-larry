@@ -55,6 +55,6 @@ export function resetStore() {
       resolvedDate: null,
     },
     history: [],
-    settings: { ntfyTopic: '', hapticFeedback: true },
+    settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true },
   });
 }

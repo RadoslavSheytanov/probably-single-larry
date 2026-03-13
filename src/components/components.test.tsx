@@ -105,11 +105,11 @@ describe('ScreenHeader', () => {
   it('renders custom titleClassName when provided', () => {
     render(
       <ScreenHeader
-        title="Drill Mode"
+        title="Quick-Start Guide"
         titleClassName="custom-class"
       />
     );
-    const heading = screen.getByText('Drill Mode');
+    const heading = screen.getByText('Quick-Start Guide');
     expect(heading).toHaveClass('custom-class');
   });
 

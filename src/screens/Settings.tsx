@@ -5,16 +5,32 @@ import { getStoredEmail } from '../services/license';
 import { haptics } from '../services/haptics';
 import ScreenHeader from '../components/ScreenHeader';
 
-function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
+function Toggle({ on, onToggle, label }: { on: boolean; onToggle: () => void; label: string }) {
+  const touchHandled = useRef(false);
+
+  function handleTouchStart(e: React.TouchEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    touchHandled.current = true;
+    onToggle();
+  }
+
+  function handleClick() {
+    if (touchHandled.current) {
+      touchHandled.current = false;
+      return;
+    }
+    onToggle();
+  }
+
   return (
     <button
-      className={`relative flex-shrink-0 rounded-full transition-colors ${on ? 'bg-amber-500/70' : 'bg-white/[8%]'}`}
+      className={`relative flex-shrink-0 rounded-full transition-colors ${on ? 'bg-white/70' : 'bg-white/[10%]'}`}
       style={{ width: 44, height: 26 }}
       role="switch"
       aria-checked={on}
-      aria-label="Toggle haptic feedback"
-      onTouchStart={(e) => { e.preventDefault(); onToggle(); }}
-      onClick={onToggle}
+      aria-label={label}
+      onTouchStart={handleTouchStart}
+      onClick={handleClick}
     >
       <motion.div
         className="absolute top-1 rounded-full bg-white"
@@ -28,8 +44,8 @@ function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between py-4 border-b border-white/[4%]">
-      <span className="text-white/50 text-sm font-light">{label}</span>
+    <div className="flex items-center justify-between py-4 border-b border-white/[5%] last:border-b-0">
+      <span className="text-white/60 text-sm font-light">{label}</span>
       {children}
     </div>
   );
@@ -91,12 +107,11 @@ export default function Settings({ onDeactivate }: Props) {
       exit={{ y: '100%' }}
       transition={{ type: 'spring', damping: 30, stiffness: 300 }}
     >
-      {/* Header */}
       <ScreenHeader
         title="Settings"
         rightElement={
           <button
-            className="text-white/30 text-xs tracking-[3px] uppercase"
+            className="text-white/34 text-[11px] tracking-[3px] uppercase"
             onTouchStart={(e) => { e.preventDefault(); handleClose(); }}
             onClick={handleClose}
           >
@@ -105,14 +120,21 @@ export default function Settings({ onDeactivate }: Props) {
         }
       />
 
-      {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-6 pb-safe-nav">
-
-        {/* ntfy Topic */}
-        <div className="py-4 border-b border-white/[4%]">
-          <p className="text-white/50 text-sm font-light mb-2">ntfy Topic</p>
+        <div className="rounded-[24px] border border-white/[8%] bg-black/20 px-5 py-5 mb-4">
+          <p className="text-white/38 text-[10px] tracking-[4px] uppercase mb-3">Notifications</p>
+          <Row label="Push Notifications">
+            <div className="flex items-center justify-center" style={{ minHeight: 44, minWidth: 44 }}>
+              <Toggle
+                on={settings.ntfyEnabled}
+                label="Toggle push notifications"
+                onToggle={() => updateSettings({ ntfyEnabled: !settings.ntfyEnabled })}
+              />
+            </div>
+          </Row>
+          <p className="text-white/62 text-sm font-light mb-3">ntfy Topic</p>
           <input
-            className="w-full bg-white/[4%] border border-white/[8%] rounded-xl px-4 py-3 text-white/70 text-sm font-light placeholder-white/[12%] outline-none focus:border-white/20"
+            className="w-full bg-white/[3%] border border-white/[8%] rounded-2xl px-4 py-3.5 text-white/78 text-sm font-light placeholder-white/[14%] outline-none focus:border-white/18"
             placeholder="your-secret-topic"
             value={ntfyInput}
             onChange={(e) => setNtfyInput(e.target.value)}
@@ -121,20 +143,28 @@ export default function Settings({ onDeactivate }: Props) {
             autoCorrect="off"
             spellCheck={false}
           />
-          <p className="text-white/[12%] text-xs mt-2">Used for watch notifications via ntfy.sh</p>
+          <p className="text-white/[18%] text-xs mt-3 leading-[1.7]">
+            {settings.ntfyEnabled
+              ? 'Used for silent delivery through ntfy.sh.'
+              : 'Disabled — results stay on your screen only.'}
+          </p>
         </div>
 
-        <Row label="Haptic Feedback">
-          <div className="flex items-center justify-center" style={{ minHeight: 44, minWidth: 44 }}>
-            <Toggle
-              on={settings.hapticFeedback}
-              onToggle={() => updateSettings({ hapticFeedback: !settings.hapticFeedback })}
-            />
-          </div>
-        </Row>
+        <div className="rounded-[24px] border border-white/[8%] bg-black/20 px-5 py-2 mb-4">
+          <p className="pt-4 text-white/38 text-[10px] tracking-[4px] uppercase">Behaviour</p>
+          <Row label="Haptic Feedback">
+            <div className="flex items-center justify-center" style={{ minHeight: 44, minWidth: 44 }}>
+              <Toggle
+                on={settings.hapticFeedback}
+                label="Toggle haptic feedback"
+                onToggle={() => updateSettings({ hapticFeedback: !settings.hapticFeedback })}
+              />
+            </div>
+          </Row>
+        </div>
 
-        {/* Clear History */}
-        <div className="py-4 border-b border-white/[4%]">
+        <div className="rounded-[24px] border border-white/[8%] bg-black/20 px-5 py-5 mb-4">
+          <p className="text-white/38 text-[10px] tracking-[4px] uppercase mb-3">History</p>
           <AnimatePresence mode="wait">
             {confirmClear ? (
               <motion.button
@@ -146,12 +176,12 @@ export default function Settings({ onDeactivate }: Props) {
                 onTouchStart={(e) => { e.preventDefault(); handleClearHistory(); }}
                 onClick={handleClearHistory}
               >
-                Tap again to confirm — this cannot be undone
+                Tap again to confirm
               </motion.button>
             ) : (
               <motion.button
                 key="clear"
-                className="text-white/30 text-sm font-light"
+                className="text-white/60 text-sm font-light"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -164,12 +194,11 @@ export default function Settings({ onDeactivate }: Props) {
           </AnimatePresence>
         </div>
 
-        {/* License */}
-        <div className="py-4 border-b border-white/[4%]">
-          <p className="text-white/50 text-sm font-light mb-2">License</p>
+        <div className="rounded-[24px] border border-white/[8%] bg-black/20 px-5 py-5">
+          <p className="text-white/38 text-[10px] tracking-[4px] uppercase mb-3">License</p>
           {storedEmail ? (
             <>
-              <p className="text-white/30 text-xs mb-3">{storedEmail}</p>
+              <p className="text-white/42 text-xs mb-3">{storedEmail}</p>
               <button
                 className="text-xs tracking-wide font-light text-err"
                 onTouchStart={(e) => { e.preventDefault(); haptics.error(); onDeactivate?.(); }}
@@ -179,13 +208,12 @@ export default function Settings({ onDeactivate }: Props) {
               </button>
             </>
           ) : (
-            <p className="text-white/[12%] text-xs">Not activated</p>
+            <p className="text-white/[18%] text-xs">Not activated</p>
           )}
         </div>
 
-        {/* Version */}
-        <div className="py-4">
-          <p className="text-white/[12%] text-xs tracking-widest uppercase">
+        <div className="py-5">
+          <p className="text-white/[12%] text-[10px] tracking-[4px] uppercase">
             Singularis v2.0.0 · PWA
           </p>
         </div>

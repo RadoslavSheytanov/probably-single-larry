@@ -8,12 +8,12 @@ function Section({ number, title, children }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="mb-12">
+    <div className="mb-14">
       <div className="flex items-center gap-3 mb-5">
-        <span className="text-white/20 text-[10px] tracking-[3px] tabular-nums">{number}</span>
-        <div className="h-px flex-1 bg-white/[6%]" />
+        <span className="text-white/24 text-[10px] tracking-[3px] tabular-nums">{number}</span>
+        <div className="h-px flex-1 bg-white/[5%]" />
       </div>
-      <h3 className="font-display text-[26px] text-white/80 leading-none mb-5 pl-1">
+      <h3 className="font-display-upright text-[26px] text-white/82 leading-none mb-5 pl-1">
         {title}
       </h3>
       <div className="space-y-4 pl-1">
@@ -25,7 +25,7 @@ function Section({ number, title, children }: {
 
 function Body({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-white/50 text-[15px] leading-[1.8] font-light">
+    <p className="text-white/56 text-[15px] leading-[1.9] font-light">
       {children}
     </p>
   );
@@ -34,10 +34,10 @@ function Body({ children }: { children: React.ReactNode }) {
 function Step({ n, children }: { n: number; children: React.ReactNode }) {
   return (
     <div className="flex gap-4">
-      <span className="text-white/20 text-[13px] font-light tabular-nums shrink-0 pt-0.5 w-5">
+      <span className="text-white/24 text-[13px] font-light tabular-nums shrink-0 pt-0.5 w-5">
         {n}.
       </span>
-      <p className="text-white/55 text-[15px] font-light leading-[1.8]">{children}</p>
+      <p className="text-white/58 text-[15px] font-light leading-[1.85]">{children}</p>
     </div>
   );
 }
@@ -45,8 +45,8 @@ function Step({ n, children }: { n: number; children: React.ReactNode }) {
 function GestureRow({ gesture, action }: { gesture: string; action: string }) {
   return (
     <div className="flex items-baseline gap-4 py-3 border-b border-white/[5%] last:border-0">
-      <span className="text-white/35 text-[13px] font-light w-36 shrink-0">{gesture}</span>
-      <span className="text-white/55 text-[13px] font-light">{action}</span>
+      <span className="text-white/38 text-[13px] font-light w-36 shrink-0">{gesture}</span>
+      <span className="text-white/58 text-[13px] font-light">{action}</span>
     </div>
   );
 }
@@ -54,7 +54,7 @@ function GestureRow({ gesture, action }: { gesture: string; action: string }) {
 function Callout({ children }: { children: React.ReactNode }) {
   return (
     <div className="border-l-2 border-white/[8%] pl-4 py-1">
-      <p className="text-white/35 text-[13px] font-light leading-[1.8]">{children}</p>
+      <p className="text-white/40 text-[13px] font-light leading-[1.8]">{children}</p>
     </div>
   );
 }
@@ -65,11 +65,11 @@ function StoreLink({ label, url }: { label: string; url: string }) {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center justify-between py-3.5 border-b border-white/[5%] last:border-0 active:opacity-60"
+      className="flex items-center justify-between py-4 border-b border-white/[5%] last:border-0 active:opacity-60"
       onClick={(e) => e.stopPropagation()}
     >
-      <span className="text-white/55 text-[15px] font-light">{label}</span>
-      <span className="text-white/25 text-[11px] tracking-[2px] uppercase">Open</span>
+      <span className="text-white/60 text-[15px] font-light">{label}</span>
+      <span className="text-white/28 text-[11px] tracking-[2px] uppercase">Open</span>
     </a>
   );
 }
@@ -89,7 +89,7 @@ export default function Instructions() {
         title="Quick-Start Guide"
         rightElement={
           <button
-            className="text-white/30 text-xs tracking-[3px] uppercase"
+            className="text-white/34 text-[11px] tracking-[3px] uppercase"
             onTouchStart={(e) => { e.preventDefault(); setScreen('home'); }}
             onClick={() => setScreen('home')}
           >
@@ -100,7 +100,7 @@ export default function Instructions() {
 
       <div className="flex-1 overflow-y-auto px-6 pb-safe-nav pt-4">
 
-        <p className="text-white/30 text-[14px] leading-[1.8] font-light mb-12">
+        <p className="text-white/30 text-[14px] leading-[1.9] font-light mb-12">
           Everything you need to perform your first reading.
           The full presentation script and advanced handling are in the PDF
           and video sent to your email after purchase.
@@ -114,7 +114,7 @@ export default function Instructions() {
             receive your results.
           </Body>
 
-          <div className="rounded-xl border border-white/[8%] px-5 mt-2">
+          <div className="rounded-[22px] border border-white/[8%] bg-black/20 px-5 mt-2">
             <StoreLink
               label="Ntfy — iOS"
               url="https://apps.apple.com/us/app/ntfy/id1625396347"
@@ -131,7 +131,7 @@ export default function Instructions() {
           </Body>
           <Body>
             Then open Settings in this app and enter that same topic.
-            Use Practice Mode to confirm it is working before you perform.
+            Send a real reading to confirm it is working before you perform.
           </Body>
         </Section>
 
@@ -232,7 +232,7 @@ export default function Instructions() {
 
         <div className="flex items-center gap-3 mt-4 mb-2">
           <div className="h-px flex-1 bg-white/[4%]" />
-          <p className="text-white/[10%] text-[9px] tracking-[4px] uppercase">Singularis</p>
+          <p className="text-white/[12%] text-[9px] tracking-[4px] uppercase">Singularis</p>
           <div className="h-px flex-1 bg-white/[4%]" />
         </div>
 

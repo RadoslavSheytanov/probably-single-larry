@@ -13,7 +13,7 @@ const INITIAL_STATE = {
     resolvedDate: null,
   },
   history: [] as Reading[],
-  settings: { ntfyTopic: '', hapticFeedback: true },
+  settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true },
 };
 
 beforeEach(() => {
@@ -327,6 +327,14 @@ describe('updateSettings', () => {
   it('merges ntfyTopic patch into settings', () => {
     useStore.getState().updateSettings({ ntfyTopic: 'my-topic' });
     expect(useStore.getState().settings.ntfyTopic).toBe('my-topic');
+    expect(useStore.getState().settings.ntfyEnabled).toBe(true); // unchanged
+    expect(useStore.getState().settings.hapticFeedback).toBe(true); // unchanged
+  });
+
+  it('merges ntfyEnabled patch into settings', () => {
+    useStore.getState().updateSettings({ ntfyEnabled: false });
+    expect(useStore.getState().settings.ntfyEnabled).toBe(false);
+    expect(useStore.getState().settings.ntfyTopic).toBe(''); // unchanged
     expect(useStore.getState().settings.hapticFeedback).toBe(true); // unchanged
   });
 
@@ -334,10 +342,11 @@ describe('updateSettings', () => {
     useStore.getState().updateSettings({ hapticFeedback: false });
     expect(useStore.getState().settings.hapticFeedback).toBe(false);
     expect(useStore.getState().settings.ntfyTopic).toBe(''); // unchanged
+    expect(useStore.getState().settings.ntfyEnabled).toBe(true); // unchanged
   });
 
   it('merges multiple fields at once', () => {
-    useStore.getState().updateSettings({ ntfyTopic: 'test', hapticFeedback: false });
-    expect(useStore.getState().settings).toEqual({ ntfyTopic: 'test', hapticFeedback: false });
+    useStore.getState().updateSettings({ ntfyTopic: 'test', ntfyEnabled: false, hapticFeedback: false });
+    expect(useStore.getState().settings).toEqual({ ntfyTopic: 'test', ntfyEnabled: false, hapticFeedback: false });
   });
 });

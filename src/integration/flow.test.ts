@@ -38,7 +38,7 @@ function resetStore() {
     screen: 'home',
     stealth: { ...CLEAN_STEALTH },
     history: [],
-    settings: { ntfyTopic: '', hapticFeedback: true },
+    settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true },
   });
 }
 

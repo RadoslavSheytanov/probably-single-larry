@@ -47,6 +47,7 @@ interface AppState {
 
 const DEFAULT_SETTINGS: AppSettings = {
   ntfyTopic: '',
+  ntfyEnabled: true,
   hapticFeedback: true,
 };
 
@@ -170,6 +171,18 @@ export const useStore = create<AppState>()(
       name: 'singularis-settings',
       // Only persist settings and history, not transient stealth state
       partialize: (s) => ({ settings: s.settings, history: s.history }),
+      merge: (persisted, current) => {
+        const typed = persisted as Partial<AppState>;
+        return {
+          ...current,
+          ...typed,
+          settings: {
+            ...DEFAULT_SETTINGS,
+            ...(typed.settings ?? {}),
+          },
+          history: typed.history ?? current.history,
+        };
+      },
     }
   )
 );
