@@ -165,14 +165,14 @@ Set in `.env.production` (gitignored). For local dev use `.env` or `.env.local`.
 - Anti-debugging: setInterval timing check across debugger statement
 - Build: `npm run build:prod` = Terser + javascript-obfuscator on dist/assets
 
-## Current State — ALL PHASES COMPLETE + TESTED
+## Current State — ALL PHASES COMPLETE + POLISHED
 - Phase 0–5: Engine, screens, output channels, PWA polish
 - Phase 6: Licensing rewritten to Cloudflare Worker + localStorage HMAC (zero server cost)
   - singularis-worker/ built: CF Worker, Gumroad verify, HMAC-SHA256 token
   - src/services/license.ts: activateLicense, validateStoredLicense, clearLicense, getStoredEmail
-  - src/screens/LicenseGate.tsx: email + key fields, activate flow
-  - src/App.tsx: simple checking/active/needs-auth state, no heartbeat
-  - src/screens/Settings.tsx: shows stored email, Deactivate button
+  - src/screens/LicenseGate.tsx: email + key fields, activate flow with 15s timeout
+  - src/App.tsx: checking/active/needs-auth state with spinner; no heartbeat
+  - src/screens/Settings.tsx: shows stored email, Deactivate button, 44px touch targets
   - src/hooks/useHeartbeat.ts: deleted (not needed in offline HMAC model)
   - AppSettings cleaned: removed activationTaps, licenseKey, licenseEmail, autoSaveCalendar, watchPeekPreview
   - WatchPreview.tsx + ics.ts deleted (calendar/watch preview removed — PWAs cannot write system calendar)
@@ -181,6 +181,18 @@ Set in `.env.production` (gitignored). For local dev use `.env` or `.env.local`.
   - ntfy format: Title = sign name, Body = "December 6" or "December 6 or January 15"
 - Home screen: Inter font added, word-by-word animated quote reveal (Framer Motion stagger)
 - End-to-end tested: engine, ntfy push to iPhone confirmed working
+- P0–P3 polish pass complete (commit 11f129a on develop):
+  - useStealthInput: haptic gating via hapticFeedback setting; opts→stable refs (no listener re-attach);
+    swipe guards block exit/back during RESOLVING; onTap callback for per-tap flash
+  - StealthInput: ordinal via DAYS_BEFORE_MONTH table; RESOLVE_GUARD_MS = LONG_PRESS_MS+200;
+    hasResolvedRef double-send guard; ResolvedDateLabel fully in Tailwind
+  - DOUBLE_TAP_MS reduced 300→150ms (prevents rhythm taps triggering undo)
+  - LicenseGate: 15s timeout, error color unified to rgba(255,90,90,0.6)
+  - Settings: haptic feedback before destructive actions, confirm timeout 3000→2000ms
+  - ResultPeek: whileTap scale on action buttons
+  - History: fade-in animation on empty state
+  - PWA manifest: added purpose:'any' icon entry alongside maskable
+  - index.css: removed unused .font-ui-light utility class
 
 ## Pre-Ship Checklist
 1. Deploy Cloudflare Worker:
