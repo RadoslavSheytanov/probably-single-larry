@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../state/store';
 import { getStoredEmail } from '../services/license';
@@ -10,6 +10,9 @@ function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
     <button
       className={`relative flex-shrink-0 rounded-full transition-colors ${on ? 'bg-amber-500/70' : 'bg-white/[8%]'}`}
       style={{ width: 44, height: 26 }}
+      role="switch"
+      aria-checked={on}
+      aria-label="Toggle haptic feedback"
       onTouchStart={(e) => { e.preventDefault(); onToggle(); }}
       onClick={onToggle}
     >
@@ -44,6 +47,15 @@ export default function Settings({ onDeactivate }: Props) {
 
   const [confirmClear, setConfirmClear] = useState(false);
   const [ntfyInput, setNtfyInput] = useState(settings.ntfyTopic);
+  const clearHistoryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (clearHistoryTimer.current !== null) {
+        clearTimeout(clearHistoryTimer.current);
+      }
+    };
+  }, []);
 
   const storedEmail = getStoredEmail();
 
@@ -52,13 +64,17 @@ export default function Settings({ onDeactivate }: Props) {
   }
 
   function handleClearHistory() {
+    if (clearHistoryTimer.current !== null) {
+      clearTimeout(clearHistoryTimer.current);
+      clearHistoryTimer.current = null;
+    }
     if (confirmClear) {
       haptics.error();
       clearHistory();
       setConfirmClear(false);
     } else {
       setConfirmClear(true);
-      setTimeout(() => setConfirmClear(false), 2000);
+      clearHistoryTimer.current = setTimeout(() => setConfirmClear(false), 2000);
     }
   }
 

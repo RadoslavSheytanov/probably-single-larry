@@ -68,55 +68,60 @@ export default function LicenseGate({ onActivated }: Props) {
 
       {/* Inputs */}
       <div className="flex-1 flex flex-col justify-center px-6 gap-3">
-        <input
-          type="email"
-          placeholder="your@email.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          onKeyDown={handleKeyDown}
-          autoCapitalize="none"
-          autoCorrect="off"
-          spellCheck={false}
-          className="w-full bg-white/[4%] border border-white/[8%] rounded-xl px-4 py-4 text-white/70 text-sm placeholder-white/[12%] outline-none focus:border-white/20"
-        />
-        <input
-          type="text"
-          placeholder="XXXX-XXXX-XXXX-XXXX"
-          value={key}
-          onChange={(e) => setKey(e.target.value)}
-          onKeyDown={handleKeyDown}
-          autoCapitalize="characters"
-          autoCorrect="off"
-          spellCheck={false}
-          className="w-full bg-white/[4%] border border-white/[8%] rounded-xl px-4 py-4 text-white/70 text-sm font-mono placeholder-white/[12%] outline-none focus:border-white/20"
-        />
+        <form className="contents" onSubmit={(e) => { e.preventDefault(); handleActivate(); }}>
+          <input
+            type="email"
+            aria-label="Email address"
+            placeholder="your@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={handleKeyDown}
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            className="w-full bg-white/[4%] border border-white/[8%] rounded-xl px-4 py-4 text-white/70 text-sm placeholder-white/[12%] outline-none focus:border-white/20"
+          />
+          <input
+            type="text"
+            aria-label="License key"
+            placeholder="XXXX-XXXX-XXXX-XXXX"
+            value={key}
+            onChange={(e) => setKey(e.target.value)}
+            onKeyDown={handleKeyDown}
+            autoCapitalize="characters"
+            autoCorrect="off"
+            spellCheck={false}
+            className="w-full bg-white/[4%] border border-white/[8%] rounded-xl px-4 py-4 text-white/70 text-sm font-mono placeholder-white/[12%] outline-none focus:border-white/20"
+          />
 
-        <AnimatePresence>
-          {error && (
-            <motion.p
-              key="err"
-              className="text-xs text-center px-4 leading-relaxed"
-              style={{ color: 'rgba(255,90,90,0.6)' }}
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-            >
-              {error}
-            </motion.p>
-          )}
-        </AnimatePresence>
+          <AnimatePresence>
+            {error && (
+              <motion.p
+                key="err"
+                className="text-xs text-center px-4 leading-relaxed"
+                style={{ color: 'rgba(255,90,90,0.6)' }}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+              >
+                {error}
+              </motion.p>
+            )}
+          </AnimatePresence>
 
-        <motion.button
-          className="w-full py-4 rounded-2xl border border-white/[12%] text-white/70 text-sm tracking-[4px] uppercase font-light bg-white/[4%]"
-          whileTap={loading ? {} : { scale: 0.97 }}
-          onTouchStart={(e) => { e.preventDefault(); if (!loading) handleActivate(); }}
-          onClick={() => { if (!loading) handleActivate(); }}
-          disabled={loading}
-        >
-          {loading
-            ? <span className="inline-block w-4 h-4 border border-white/30 border-t-white/70 rounded-full animate-spin" />
-            : 'Activate'}
-        </motion.button>
+          <motion.button
+            type="submit"
+            className={`w-full py-4 rounded-2xl border border-white/[12%] text-white/70 text-sm tracking-[4px] uppercase font-light bg-white/[4%]${loading ? ' opacity-50 pointer-events-none' : ''}`}
+            whileTap={loading ? {} : { scale: 0.97 }}
+            onTouchStart={(e) => { e.preventDefault(); if (!loading) handleActivate(); }}
+            onClick={() => { if (!loading) handleActivate(); }}
+            disabled={loading}
+          >
+            {loading
+              ? <span className="inline-block w-4 h-4 border border-white/30 border-t-white/70 rounded-full animate-spin" />
+              : 'Activate'}
+          </motion.button>
+        </form>
 
         <a
           href="https://gumroad.com/l/singularis"

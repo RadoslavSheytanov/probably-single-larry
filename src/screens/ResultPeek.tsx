@@ -23,6 +23,7 @@ export default function ResultPeek() {
       resolvedDate: date,
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Intentional: records exactly once on mount — component only mounts when result is fresh
   }, []);
 
   const handleNewReading = useCallback(() => {

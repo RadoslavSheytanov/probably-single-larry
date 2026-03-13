@@ -11,7 +11,7 @@ function HistoryEntry({ reading }: { reading: Reading }) {
   const { day, month, sign } = date;
 
   return (
-    <div className="flex items-center py-4 border-b border-white/[4%]">
+    <li className="flex items-center py-4 border-b border-white/[4%] list-none">
       <span className="text-3xl mr-4 leading-none">{sign.symbol}</span>
       <div className="flex-1 min-w-0">
         <p className="text-white/80 text-base font-light">
@@ -28,7 +28,7 @@ function HistoryEntry({ reading }: { reading: Reading }) {
       <p className="text-white/30 text-xs tracking-wide ml-3 text-right flex-shrink-0">
         {sign.name}
       </p>
-    </div>
+    </li>
   );
 }
 
@@ -69,9 +69,11 @@ export default function History() {
             <p className="text-white/[12%] text-sm tracking-widest uppercase">No readings yet</p>
           </motion.div>
         ) : (
-          history.map((reading) => (
-            <HistoryEntry key={reading.id} reading={reading} />
-          ))
+          <ul className="list-none p-0 m-0">
+            {history.map((reading) => (
+              <HistoryEntry key={reading.id} reading={reading} />
+            ))}
+          </ul>
         )}
       </div>
 

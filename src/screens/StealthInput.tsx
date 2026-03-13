@@ -37,6 +37,8 @@ export default function StealthInput() {
   // Wake lock — keep screen on while in performance mode
   useEffect(() => {
     acquireWakeLock();
+    // Always re-acquire on visibility change — this component only mounts
+    // during active performance mode (screen === 'stealth')
     const isActive = () => true;
     const cleanup = setupWakeLockReacquire(isActive);
     return () => {
@@ -203,7 +205,7 @@ export default function StealthInput() {
 
       {/* Practice mode shortcut (top-right, very subtle) */}
       <button
-        className="absolute top-safe right-6 text-white/15 text-xs tracking-widest uppercase"
+        className="absolute top-safe right-6 text-white/15 text-xs tracking-widest uppercase min-h-[44px] min-w-[44px] flex items-center justify-center"
         style={{ touchAction: 'none' }}
         onTouchStart={(e) => {
           e.stopPropagation();
