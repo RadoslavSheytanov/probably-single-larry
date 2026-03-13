@@ -79,13 +79,8 @@ export default function StealthInput() {
   }, [store, settings.ntfyTopic, setScreen]);
 
   const handleAmbiguous = useCallback(() => {
-    // Fire ntfy with BOTH dates so performer sees options on watch
-    const result = store.stealth.engineResult;
-    if (result?.kind === 'ambiguous') {
-      ntfySend(settings.ntfyTopic, result.primary, result.alternate);
-    }
-    // Stay in RESOLVING phase on stealth screen
-  }, [store, settings.ntfyTopic]);
+    // Stay in RESOLVING phase — ntfy fires only after performer confirms the date
+  }, []);
 
   // Wrap handleTap to also trigger flash — we intercept via a custom wrapper
   // The hook handles the actual logic; we patch flash via a proxy ref

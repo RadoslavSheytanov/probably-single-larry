@@ -157,7 +157,8 @@ Set in `.env.production` (gitignored). For local dev use `.env` or `.env.local`.
 
 ## Ambiguous Resolution
 - TOP half tap = earlier date; BOTTOM = later
-- ntfy fires twice: both dates first, confirmed date after resolution
+- ntfy fires ONCE — only after the performer taps to confirm the correct date
+- No notification is sent until the ambiguity is resolved
 
 ## Production Hardening (main.tsx, PROD only)
 - Domain lock: blank if hostname not in ALLOWED_DOMAINS — update before deploy
