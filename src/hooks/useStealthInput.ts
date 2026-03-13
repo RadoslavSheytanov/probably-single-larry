@@ -12,6 +12,8 @@ interface Options {
   onAmbiguous?: () => void;
   onExit?: () => void;
   onGoBack?: () => void;
+  /** Called on every single tap — use for flash/visual feedback */
+  onTap?: (isTopZone: boolean) => void;
 }
 
 export function useStealthInput(containerRef: React.RefObject<HTMLElement | null>, opts: Options = {}) {
@@ -19,8 +21,9 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
   const phase = useStore((s) => s.stealth.phase);
   const anchorValue = useStore((s) => s.stealth.anchorValue);
   const differenceValue = useStore((s) => s.stealth.differenceValue);
+  const hapticEnabled = useStore((s) => s.settings.hapticFeedback);
 
-  // Refs for gesture tracking (avoids stale closures in event handlers)
+  // Refs for gesture tracking (avoids stale closures in native event handlers)
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastTapTime = useRef<number>(0);
   const lastTapCount = useRef<number>(0);
@@ -33,30 +36,52 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
   const phaseRef = useRef<Phase>(phase);
   const anchorRef = useRef(anchorValue);
   const differenceRef = useRef(differenceValue);
+  const hapticRef = useRef(hapticEnabled);
 
-  // Keep refs in sync with store
+  // Keep refs in sync with store values
   useEffect(() => { phaseRef.current = phase; }, [phase]);
   useEffect(() => { anchorRef.current = anchorValue; }, [anchorValue]);
   useEffect(() => { differenceRef.current = differenceValue; }, [differenceValue]);
+  useEffect(() => { hapticRef.current = hapticEnabled; }, [hapticEnabled]);
+
+  // Stable refs for opts callbacks — prevents opts from being a useEffect dependency
+  // (which would cause touch listeners to detach/reattach on every render)
+  const onAnchorTooLowRef = useRef(opts.onAnchorTooLow);
+  const onErrorRef = useRef(opts.onError);
+  const onResultRef = useRef(opts.onResult);
+  const onAmbiguousRef = useRef(opts.onAmbiguous);
+  const onExitRef = useRef(opts.onExit);
+  const onGoBackRef = useRef(opts.onGoBack);
+  const onTapRef = useRef(opts.onTap);
+
+  // Update refs every render so callbacks are always current
+  onAnchorTooLowRef.current = opts.onAnchorTooLow;
+  onErrorRef.current = opts.onError;
+  onResultRef.current = opts.onResult;
+  onAmbiguousRef.current = opts.onAmbiguous;
+  onExitRef.current = opts.onExit;
+  onGoBackRef.current = opts.onGoBack;
+  onTapRef.current = opts.onTap;
+
+  // Conditional haptic helper — respects the hapticFeedback setting
+  const h = useCallback((fn: () => void) => {
+    if (hapticRef.current) fn();
+  }, []);
 
   const handleTap = useCallback((isTopZone: boolean) => {
     const currentPhase = phaseRef.current;
     if (currentPhase !== 'ANCHOR' && currentPhase !== 'DIFFERENCE') return;
 
     const amount = isTopZone ? 10 : 1;
-
     if (currentPhase === 'ANCHOR') {
       store.incrementAnchor(amount);
     } else {
       store.incrementDifference(amount);
     }
 
-    if (isTopZone) {
-      haptics.tapTen();
-    } else {
-      haptics.tapOne();
-    }
-  }, [store]);
+    h(() => isTopZone ? haptics.tapTen() : haptics.tapOne());
+    onTapRef.current?.(isTopZone);
+  }, [store, h]);
 
   const handleConfirm = useCallback(() => {
     const currentPhase = phaseRef.current;
@@ -64,11 +89,11 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
     if (currentPhase === 'ANCHOR') {
       const a = anchorRef.current;
       if (a < 5) {
-        haptics.error();
-        opts.onAnchorTooLow?.();
+        h(() => haptics.error());
+        onAnchorTooLowRef.current?.();
         return;
       }
-      haptics.confirm();
+      h(() => haptics.confirm());
       store.confirmAnchor();
       return;
     }
@@ -79,44 +104,44 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
       const result = compute(a, d);
 
       if (result.kind === 'error') {
-        haptics.error();
-        opts.onError?.(result.reason);
+        h(() => haptics.error());
+        onErrorRef.current?.(result.reason);
         return;
       }
 
       store.confirmDifference(result);
 
       if (result.kind === 'ambiguous') {
-        haptics.ambiguous();
-        opts.onAmbiguous?.();
+        h(() => haptics.ambiguous());
+        onAmbiguousRef.current?.();
       } else {
-        haptics.result();
-        opts.onResult?.();
+        h(() => haptics.result());
+        onResultRef.current?.();
       }
     }
-  }, [store, opts]);
+  }, [store, h]);
 
   const handleUndo = useCallback(() => {
     const currentPhase = phaseRef.current;
     if (currentPhase !== 'ANCHOR' && currentPhase !== 'DIFFERENCE') return;
-    haptics.undo();
+    h(() => haptics.undo());
     store.undoLast();
-  }, [store]);
+  }, [store, h]);
 
   const handleReset = useCallback(() => {
     const currentPhase = phaseRef.current;
     if (currentPhase !== 'ANCHOR' && currentPhase !== 'DIFFERENCE') return;
-    haptics.error();
+    h(() => haptics.error());
     store.resetCurrentPhase();
-  }, [store]);
+  }, [store, h]);
 
   const handleGoBack = useCallback(() => {
     const currentPhase = phaseRef.current;
     if (currentPhase !== 'ANCHOR' && currentPhase !== 'DIFFERENCE') return;
-    haptics.back();
+    h(() => haptics.back());
     store.goBackPhase();
-    opts.onGoBack?.();
-  }, [store, opts]);
+    onGoBackRef.current?.();
+  }, [store, h]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -164,16 +189,20 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
       const deltaX = touch.clientX - touchStartX.current;
       const elapsed = Date.now() - swipeStartTime.current;
 
-      // Swipe down to exit (> 80px downward, fast)
+      const inResolving = phaseRef.current === 'RESOLVING';
+
+      // Swipe down to exit — blocked in RESOLVING to prevent accidental abort
       if (deltaY > 80 && Math.abs(deltaX) < 60 && elapsed < 500) {
-        haptics.exit();
-        opts.onExit?.();
+        if (!inResolving) {
+          hapticRef.current && haptics.exit();
+          onExitRef.current?.();
+        }
         return;
       }
 
-      // Swipe left to go back one phase / reset (> 80px leftward, fast)
+      // Swipe left to go back — blocked in RESOLVING to prevent accidental reset
       if (-deltaX > 80 && Math.abs(deltaY) < 60 && elapsed < 500) {
-        handleGoBack();
+        if (!inResolving) handleGoBack();
         return;
       }
 
@@ -226,7 +255,8 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
       el.removeEventListener('touchmove', onTouchMove);
       clearLongPressTimer();
     };
-  }, [containerRef, handleTap, handleConfirm, handleUndo, handleReset, handleGoBack, opts]);
+    // opts callbacks are now refs — removed from deps to prevent listener re-attach on every render
+  }, [containerRef, handleTap, handleConfirm, handleUndo, handleReset, handleGoBack]);
 
   // Keyboard shortcuts for desktop testing
   useEffect(() => {
@@ -253,12 +283,12 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
           handleReset();
           break;
         case 'Escape':
-          opts.onExit?.();
+          onExitRef.current?.();
           break;
       }
     }
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [handleTap, handleConfirm, handleUndo, handleReset, opts]);
+  }, [handleTap, handleConfirm, handleUndo, handleReset]);
 }

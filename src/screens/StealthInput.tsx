@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../state/store';
 import { useStealthInput } from '../hooks/useStealthInput';
@@ -6,11 +6,22 @@ import PhaseIndicator from '../components/PhaseIndicator';
 import { ntfySend } from '../services/ntfy';
 import { haptics } from '../services/haptics';
 import { acquireWakeLock, releaseWakeLock, setupWakeLockReacquire } from '../services/wakeLock';
-import { MONTH_NAMES } from '../utils/constants';
+import { MONTH_NAMES, LONG_PRESS_MS } from '../utils/constants';
+
+// Correct ordinal using cumulative days — avoids fragile month*31+day formula
+const DAYS_BEFORE_MONTH = [0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334] as const;
+function dateOrd(month: number, day: number): number {
+  return DAYS_BEFORE_MONTH[month] + day;
+}
+
+// Guard: ignore finger-lift from the long press that triggers RESOLVING.
+// Must be slightly longer than LONG_PRESS_MS so the lift is always absorbed.
+const RESOLVE_GUARD_MS = LONG_PRESS_MS + 200;
 
 export default function StealthInput() {
   const containerRef = useRef<HTMLDivElement>(null);
   const resolvingAt = useRef<number>(0);
+  const hasResolvedRef = useRef<boolean>(false); // prevents double ntfy send
   const store = useStore();
   const phase = useStore((s) => s.stealth.phase);
   const anchorValue = useStore((s) => s.stealth.anchorValue);
@@ -43,11 +54,11 @@ export default function StealthInput() {
     : phase === 'RESOLVING' ? 'RESOLVING'
     : '';
 
-  // Flash number briefly on tap
+  // Flash number briefly on tap — called via onTap from the hook
   const triggerFlash = useCallback((isTopZone: boolean) => {
     const target = isTopZone ? 0.15 : 0.12;
     setFlashOpacity(target);
-    setTimeout(() => setFlashOpacity(0.08), isTopZone ? 200 : 150);
+    setTimeout(() => setFlashOpacity(0.08), 200);
   }, []);
 
   const handleExit = useCallback(() => {
@@ -72,7 +83,6 @@ export default function StealthInput() {
   }, []);
 
   const handleResult = useCallback(() => {
-    // Fire ntfy with confirmed single date
     const result = store.stealth.engineResult;
     if (result?.kind === 'ok') {
       ntfySend(settings.ntfyTopic, result.primary, null);
@@ -81,33 +91,27 @@ export default function StealthInput() {
   }, [store, settings.ntfyTopic, setScreen]);
 
   const handleAmbiguous = useCallback(() => {
-    // Stamp when we entered RESOLVING so the finger-lift from the long press is ignored
+    // Stamp entry time so finger-lift from the long press is ignored
     resolvingAt.current = Date.now();
+    // Reset double-send guard for this resolution session
+    hasResolvedRef.current = false;
   }, []);
 
-  // Wrap handleTap to also trigger flash — we intercept via a custom wrapper
-  // The hook handles the actual logic; we patch flash via a proxy ref
-  const flashRef = useRef(triggerFlash);
-  flashRef.current = triggerFlash;
-
-  const stealthOpts = useMemo(() => ({
+  useStealthInput(containerRef as React.RefObject<HTMLElement | null>, {
     onAnchorTooLow: handleAnchorTooLow,
     onError: handleError,
     onResult: handleResult,
     onAmbiguous: handleAmbiguous,
     onExit: handleExit,
-    onGoBack: () => {},
-  }), [handleAnchorTooLow, handleError, handleResult, handleAmbiguous, handleExit]);
-
-  useStealthInput(containerRef as React.RefObject<HTMLElement | null>, stealthOpts);
+    onTap: triggerFlash,
+  });
 
   // Resolve ambiguous via top/bottom tap when in RESOLVING phase
-  // Guard: ignore the finger-lift from the long press that triggered RESOLVING
-  const RESOLVE_GUARD_MS = 800;
   function handleResolveTap(e: React.TouchEvent | React.MouseEvent) {
     if (phase !== 'RESOLVING') return;
     if (engineResult?.kind !== 'ambiguous') return;
     if (Date.now() - resolvingAt.current < RESOLVE_GUARD_MS) return;
+    if (hasResolvedRef.current) return; // prevent double-send on rapid taps
 
     const clientY = 'touches' in e
       ? (e as React.TouchEvent).changedTouches?.[0]?.clientY ?? 0
@@ -115,18 +119,15 @@ export default function StealthInput() {
 
     const isTop = clientY < window.innerHeight * 0.5;
 
-    // Sort: primary = earlier in calendar year, alternate = later
     const { primary, alternate } = engineResult;
-    const primaryOrdinal = primary.month * 31 + primary.day;
-    const alternateOrdinal = alternate.month * 31 + alternate.day;
-
-    const earlier = primaryOrdinal <= alternateOrdinal ? primary : alternate;
-    const later = primaryOrdinal <= alternateOrdinal ? alternate : primary;
+    const earlier = dateOrd(primary.month, primary.day) <= dateOrd(alternate.month, alternate.day)
+      ? primary : alternate;
+    const later = earlier === primary ? alternate : primary;
 
     const chosen = isTop ? earlier : later;
+    hasResolvedRef.current = true;
     haptics.resolved();
     store.resolveAmbiguous(chosen);
-    // Fire second ntfy with the confirmed single date
     ntfySend(settings.ntfyTopic, chosen, null);
     setScreen('result');
   }
@@ -169,10 +170,9 @@ export default function StealthInput() {
       {/* RESOLVING state — full-screen split, earlier on top, later on bottom */}
       {phase === 'RESOLVING' && engineResult?.kind === 'ambiguous' && (() => {
         const { primary, alternate } = engineResult;
-        const pOrd = primary.month * 31 + primary.day;
-        const aOrd = alternate.month * 31 + alternate.day;
-        const earlier = pOrd <= aOrd ? primary : alternate;
-        const later   = pOrd <= aOrd ? alternate : primary;
+        const earlier = dateOrd(primary.month, primary.day) <= dateOrd(alternate.month, alternate.day)
+          ? primary : alternate;
+        const later = earlier === primary ? alternate : primary;
         return (
           <motion.div
             className="absolute inset-0 flex flex-col pointer-events-none select-none"
@@ -180,7 +180,7 @@ export default function StealthInput() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
           >
-            {/* Top half — earlier date (tap this half to select) */}
+            {/* Top half — earlier date */}
             <div className="flex-1 flex items-center justify-center">
               <ResolvedDateLabel date={earlier} />
             </div>
@@ -234,14 +234,14 @@ export default function StealthInput() {
             onTouchEnd={(e) => { e.preventDefault(); dismissWarning(); }}
             onClick={dismissWarning}
           >
-            <div className="text-4xl mb-6" style={{ opacity: 0.4 }}>⚠</div>
+            <div className="text-4xl mb-6 opacity-40">⚠</div>
             {warningMessage.split('\n').map((line, i) => (
               <p
                 key={i}
                 className="text-white text-center px-12"
                 style={{
                   fontSize: i === 0 ? 18 : 13,
-                  fontWeight: i === 0 ? 300 : 200,
+                  fontWeight: i === 0 ? 300 : 300,
                   opacity: i === 0 ? 0.7 : 0.35,
                   letterSpacing: 2,
                   marginBottom: 6,
@@ -260,12 +260,12 @@ export default function StealthInput() {
 
 function ResolvedDateLabel({ date }: { date: { day: number; month: number; sign: { name: string; symbol: string } } }) {
   return (
-    <div className="text-center" style={{ opacity: 0.55 }}>
-      <div className="text-white" style={{ fontSize: 28, lineHeight: 1, marginBottom: 8 }}>{date.sign.symbol}</div>
-      <div className="text-white" style={{ fontSize: 32, fontWeight: 100, letterSpacing: 1 }}>
+    <div className="text-center opacity-55">
+      <div className="text-white text-[28px] leading-none mb-2">{date.sign.symbol}</div>
+      <div className="text-white text-[32px] font-thin tracking-wide">
         {MONTH_NAMES[date.month - 1]} {date.day}
       </div>
-      <div className="text-white/40 uppercase tracking-widest" style={{ fontSize: 11, fontWeight: 300, marginTop: 6 }}>
+      <div className="text-white/40 uppercase tracking-widest text-[11px] font-light mt-1.5">
         {date.sign.name}
       </div>
     </div>

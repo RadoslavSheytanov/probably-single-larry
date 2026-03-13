@@ -70,11 +70,6 @@
     font-weight: 400;
   }
 
-  /* .font-ui-light — Inter weight 300 */
-  .font-ui-light {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-    font-weight: 300;
-  }
 }
 
 html,

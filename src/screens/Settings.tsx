@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../state/store';
 import { getStoredEmail } from '../services/license';
+import { haptics } from '../services/haptics';
 import ScreenHeader from '../components/ScreenHeader';
 
 function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
@@ -52,11 +53,12 @@ export default function Settings({ onDeactivate }: Props) {
 
   function handleClearHistory() {
     if (confirmClear) {
+      haptics.error();
       clearHistory();
       setConfirmClear(false);
     } else {
       setConfirmClear(true);
-      setTimeout(() => setConfirmClear(false), 3000);
+      setTimeout(() => setConfirmClear(false), 2000);
     }
   }
 
@@ -107,10 +109,12 @@ export default function Settings({ onDeactivate }: Props) {
         </div>
 
         <Row label="Haptic Feedback">
-          <Toggle
-            on={settings.hapticFeedback}
-            onToggle={() => updateSettings({ hapticFeedback: !settings.hapticFeedback })}
-          />
+          <div className="flex items-center justify-center" style={{ minHeight: 44, minWidth: 44 }}>
+            <Toggle
+              on={settings.hapticFeedback}
+              onToggle={() => updateSettings({ hapticFeedback: !settings.hapticFeedback })}
+            />
+          </div>
         </Row>
 
         {/* Clear History */}
@@ -120,7 +124,7 @@ export default function Settings({ onDeactivate }: Props) {
               <motion.button
                 key="confirm"
                 className="text-sm font-light tracking-wide"
-                style={{ color: 'rgba(255,90,90,0.8)' }}
+                style={{ color: 'rgba(255,90,90,0.6)' }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -153,9 +157,9 @@ export default function Settings({ onDeactivate }: Props) {
               <p className="text-white/30 text-xs mb-3">{storedEmail}</p>
               <button
                 className="text-xs tracking-wide font-light"
-                style={{ color: 'rgba(255,90,90,0.5)' }}
-                onTouchStart={(e) => { e.preventDefault(); onDeactivate?.(); }}
-                onClick={() => onDeactivate?.()}
+                style={{ color: 'rgba(255,90,90,0.6)' }}
+                onTouchStart={(e) => { e.preventDefault(); haptics.error(); onDeactivate?.(); }}
+                onClick={() => { haptics.error(); onDeactivate?.(); }}
               >
                 Deactivate
               </button>

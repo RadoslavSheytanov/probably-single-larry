@@ -20,7 +20,10 @@ const WORKER_URL = (import.meta.env.VITE_WORKER_URL as string | undefined)?.repl
   ?? 'http://localhost:8787';
 
 // Must equal HMAC_SECRET set in the Cloudflare Worker.
-// Set VITE_LICENSE_SALT in .env.production; dev fallback is the constant.
+// Set VITE_LICENSE_SALT in .env.production before deploying.
+// If missing in production, the HMAC will not match tokens issued by the Worker
+// (which uses HMAC_SECRET from wrangler secrets), so validation correctly fails
+// for all stored tokens — forcing re-activation. No silent bypass possible.
 const LICENSE_SALT = (import.meta.env.VITE_LICENSE_SALT as string | undefined)
   ?? 'k9x2mP7qR4vL8nJ1';
 

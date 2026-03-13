@@ -28,7 +28,11 @@ export default function App() {
   }
 
   if (authState === 'checking') {
-    return <div className="fixed inset-0 bg-black" />;
+    return (
+      <div className="fixed inset-0 bg-black flex items-center justify-center">
+        <span className="w-4 h-4 rounded-full border border-white/20 border-t-white/40 animate-spin" />
+      </div>
+    );
   }
 
   if (authState === 'needs-auth') {

@@ -60,9 +60,14 @@ export default function History() {
       {/* List */}
       <div className="flex-1 overflow-y-auto px-6 pb-safe-nav">
         {history.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full pb-20">
+          <motion.div
+            className="flex flex-col items-center justify-center h-full pb-20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             <p className="text-white/[12%] text-sm tracking-widest uppercase">No readings yet</p>
-          </div>
+          </motion.div>
         ) : (
           history.map((reading) => (
             <HistoryEntry key={reading.id} reading={reading} />

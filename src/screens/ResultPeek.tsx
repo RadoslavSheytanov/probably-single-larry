@@ -95,21 +95,23 @@ export default function ResultPeek() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <button
+        <motion.button
           className="w-full py-4 rounded-2xl border border-white/[12%] text-white/50 text-sm tracking-[3px] uppercase font-light"
+          whileTap={{ scale: 0.97 }}
           onTouchStart={(e) => { e.preventDefault(); handleNewReading(); }}
           onClick={handleNewReading}
         >
           New Reading
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
           className="w-full py-3 text-white/20 text-xs tracking-widest uppercase"
+          whileTap={{ scale: 0.97 }}
           onTouchStart={(e) => { e.preventDefault(); handleHome(); }}
           onClick={handleHome}
         >
           Home
-        </button>
+        </motion.button>
       </motion.div>
     </motion.div>
   );

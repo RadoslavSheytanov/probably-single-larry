@@ -21,11 +21,23 @@ export default function LicenseGate({ onActivated }: Props) {
     setLoading(true);
     setError('');
 
-    const result = await activateLicense(email, key);
-    if (result.ok) {
-      onActivated();
-    } else {
-      setError(result.error);
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('timeout')), 15000)
+    );
+    try {
+      const result = await Promise.race([activateLicense(email, key), timeoutPromise]);
+      if (result.ok) {
+        onActivated();
+      } else {
+        setError(result.error);
+      }
+    } catch (err) {
+      if (err instanceof Error && err.message === 'timeout') {
+        setError('Request timed out. Check your connection and try again.');
+      } else {
+        setError('Activation failed. Try again.');
+      }
+    } finally {
       setLoading(false);
     }
   }
@@ -84,7 +96,7 @@ export default function LicenseGate({ onActivated }: Props) {
             <motion.p
               key="err"
               className="text-xs text-center px-4 leading-relaxed"
-              style={{ color: 'rgba(255,90,90,0.75)' }}
+              style={{ color: 'rgba(255,90,90,0.6)' }}
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
