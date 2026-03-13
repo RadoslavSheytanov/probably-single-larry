@@ -4,6 +4,7 @@ import { useStore } from '../state/store';
 import { useStealthInput } from '../hooks/useStealthInput';
 import PhaseIndicator from '../components/PhaseIndicator';
 import { ntfySend } from '../services/ntfy';
+import { haptics } from '../services/haptics';
 import { acquireWakeLock, releaseWakeLock, setupWakeLockReacquire } from '../services/wakeLock';
 import { MONTH_NAMES } from '../utils/constants';
 
@@ -95,6 +96,7 @@ export default function StealthInput() {
     onResult: handleResult,
     onAmbiguous: handleAmbiguous,
     onExit: handleExit,
+    onGoBack: () => {},
   }), [handleAnchorTooLow, handleError, handleResult, handleAmbiguous, handleExit]);
 
   useStealthInput(containerRef as React.RefObject<HTMLElement | null>, stealthOpts);
@@ -122,6 +124,7 @@ export default function StealthInput() {
     const later = primaryOrdinal <= alternateOrdinal ? alternate : primary;
 
     const chosen = isTop ? earlier : later;
+    haptics.resolved();
     store.resolveAmbiguous(chosen);
     // Fire second ntfy with the confirmed single date
     ntfySend(settings.ntfyTopic, chosen, null);

@@ -11,6 +11,7 @@ interface Options {
   onResult?: () => void;
   onAmbiguous?: () => void;
   onExit?: () => void;
+  onGoBack?: () => void;
 }
 
 export function useStealthInput(containerRef: React.RefObject<HTMLElement | null>, opts: Options = {}) {
@@ -109,6 +110,14 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
     store.resetCurrentPhase();
   }, [store]);
 
+  const handleGoBack = useCallback(() => {
+    const currentPhase = phaseRef.current;
+    if (currentPhase !== 'ANCHOR' && currentPhase !== 'DIFFERENCE') return;
+    haptics.back();
+    store.goBackPhase();
+    opts.onGoBack?.();
+  }, [store, opts]);
+
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -157,7 +166,14 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
 
       // Swipe down to exit (> 80px downward, fast)
       if (deltaY > 80 && Math.abs(deltaX) < 60 && elapsed < 500) {
+        haptics.exit();
         opts.onExit?.();
+        return;
+      }
+
+      // Swipe left to go back one phase / reset (> 80px leftward, fast)
+      if (-deltaX > 80 && Math.abs(deltaY) < 60 && elapsed < 500) {
+        handleGoBack();
         return;
       }
 
@@ -210,7 +226,7 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
       el.removeEventListener('touchmove', onTouchMove);
       clearLongPressTimer();
     };
-  }, [containerRef, handleTap, handleConfirm, handleUndo, handleReset, opts]);
+  }, [containerRef, handleTap, handleConfirm, handleUndo, handleReset, handleGoBack, opts]);
 
   // Keyboard shortcuts for desktop testing
   useEffect(() => {

@@ -31,7 +31,7 @@ export default function Home() {
     >
       {/* Header */}
       <div className="flex flex-col items-center pt-safe-header px-6 pb-0">
-        <p className="text-[9px] tracking-[8px] uppercase text-white/30">
+        <p className="text-[11px] tracking-[8px] uppercase font-medium text-white/50">
           Singularis
         </p>
         <div className="mt-5 w-10 border-t border-white/[8%]" />
@@ -67,7 +67,7 @@ export default function Home() {
           transition={{ delay: 0.35 + QUOTE_WORDS.length * 0.06 + 0.15, duration: 0.4 }}
         >
           <div className="h-px w-4 bg-white/[8%]" />
-          <p className="text-[7px] tracking-[3px] uppercase text-white/[12%]">
+          <p className="text-[7px] tracking-[3px] uppercase text-white/30">
             Arthur Conan Doyle
           </p>
           <div className="h-px w-4 bg-white/[8%]" />

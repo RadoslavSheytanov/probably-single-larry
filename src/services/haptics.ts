@@ -35,4 +35,10 @@ export const haptics = {
 
   /** Ambiguous resolved — single date confirmed */
   resolved: () => vibrate([15, 30, 15]),
+
+  /** Go back / phase reset (swipe left) — softer than error */
+  back: () => vibrate([10, 40, 10]),
+
+  /** Exit performance mode (swipe down) */
+  exit: () => vibrate(30),
 };

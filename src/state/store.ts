@@ -28,6 +28,7 @@ interface AppState {
   incrementAnchor: (amount: number) => void;
   incrementDifference: (amount: number) => void;
   undoLast: () => void;
+  goBackPhase: () => void;
   resetCurrentPhase: () => void;
   confirmAnchor: () => void;
   confirmDifference: (result: EngineResult) => void;
@@ -105,6 +106,16 @@ export const useStore = create<AppState>()(
               lastAdded: 0,
             },
           };
+        }),
+
+      goBackPhase: () =>
+        set((s) => {
+          if (s.stealth.phase === 'DIFFERENCE') {
+            // Go back to ANCHOR, reset everything
+            return { stealth: { ...DEFAULT_STEALTH } };
+          }
+          // In ANCHOR: same as full reset
+          return { stealth: { ...DEFAULT_STEALTH } };
         }),
 
       resetCurrentPhase: () =>
