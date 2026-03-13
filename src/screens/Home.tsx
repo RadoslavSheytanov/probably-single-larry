@@ -154,6 +154,21 @@ export default function Home() {
         <motion.button
           className="flex flex-col items-center gap-1.5 text-white/30 active:text-white/50"
           whileTap={{ scale: 0.92 }}
+          onTouchStart={(e) => { e.preventDefault(); setScreen('instructions'); }}
+          onClick={() => setScreen('instructions')}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.75, duration: 0.4 }}
+        >
+          <span className="text-lg">✦</span>
+          <span className="text-[8px] tracking-[2.5px] uppercase">
+            Guide
+          </span>
+        </motion.button>
+
+        <motion.button
+          className="flex flex-col items-center gap-1.5 text-white/30 active:text-white/50"
+          whileTap={{ scale: 0.92 }}
           onTouchStart={(e) => { e.preventDefault(); setScreen('settings'); }}
           onClick={() => setScreen('settings')}
           initial={{ opacity: 0 }}

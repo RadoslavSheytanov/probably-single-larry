@@ -1,6 +1,6 @@
 export type Phase = 'ANCHOR' | 'DIFFERENCE' | 'COMPUTED' | 'RESOLVING';
 
-export type Screen = 'home' | 'stealth' | 'result' | 'settings' | 'history' | 'practice';
+export type Screen = 'home' | 'stealth' | 'result' | 'settings' | 'history' | 'practice' | 'instructions';
 
 
 export interface StarSign {
