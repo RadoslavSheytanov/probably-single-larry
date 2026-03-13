@@ -30,6 +30,9 @@ export const haptics = {
   /** Result computed (ascending pattern) */
   result: () => vibrate([8, 30, 12, 30, 20]),
 
-  /** Ambiguous resolved */
+  /** Two possible dates — signal performer to peek screen */
+  ambiguous: () => vibrate([20, 80, 20]),
+
+  /** Ambiguous resolved — single date confirmed */
   resolved: () => vibrate([15, 30, 15]),
 };

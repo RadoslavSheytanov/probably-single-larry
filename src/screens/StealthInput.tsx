@@ -158,49 +158,35 @@ export default function StealthInput() {
         </motion.div>
       )}
 
-      {/* RESOLVING state — show both dates */}
-      {phase === 'RESOLVING' && engineResult?.kind === 'ambiguous' && (
-        <motion.div
-          className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4 }}
-        >
-          {/* Top date (earlier) */}
-          <div className="flex flex-col items-center" style={{ opacity: 0.12 }}>
-            <div className="text-white" style={{ fontSize: 11, fontWeight: 300, letterSpacing: 4, textTransform: 'uppercase', marginBottom: 4 }}>
-              tap top
+      {/* RESOLVING state — full-screen split, earlier on top, later on bottom */}
+      {phase === 'RESOLVING' && engineResult?.kind === 'ambiguous' && (() => {
+        const { primary, alternate } = engineResult;
+        const pOrd = primary.month * 31 + primary.day;
+        const aOrd = alternate.month * 31 + alternate.day;
+        const earlier = pOrd <= aOrd ? primary : alternate;
+        const later   = pOrd <= aOrd ? alternate : primary;
+        return (
+          <motion.div
+            className="absolute inset-0 flex flex-col pointer-events-none select-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+          >
+            {/* Top half — earlier date (tap this half to select) */}
+            <div className="flex-1 flex items-center justify-center">
+              <ResolvedDateLabel date={earlier} />
             </div>
-            <ResolvedDateLabel date={
-              (() => {
-                const { primary, alternate } = engineResult;
-                const pOrd = primary.month * 31 + primary.day;
-                const aOrd = alternate.month * 31 + alternate.day;
-                return pOrd <= aOrd ? primary : alternate;
-              })()
-            } />
-          </div>
 
-          <div className="text-white my-10" style={{ opacity: 0.06, fontSize: 11, letterSpacing: 6, textTransform: 'uppercase' }}>
-            or
-          </div>
+            {/* Hairline divider */}
+            <div className="w-full" style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} />
 
-          {/* Bottom date (later) */}
-          <div className="flex flex-col items-center" style={{ opacity: 0.12 }}>
-            <ResolvedDateLabel date={
-              (() => {
-                const { primary, alternate } = engineResult;
-                const pOrd = primary.month * 31 + primary.day;
-                const aOrd = alternate.month * 31 + alternate.day;
-                return pOrd <= aOrd ? alternate : primary;
-              })()
-            } />
-            <div className="text-white" style={{ fontSize: 11, fontWeight: 300, letterSpacing: 4, textTransform: 'uppercase', marginTop: 4 }}>
-              tap bottom
+            {/* Bottom half — later date */}
+            <div className="flex-1 flex items-center justify-center">
+              <ResolvedDateLabel date={later} />
             </div>
-          </div>
-        </motion.div>
-      )}
+          </motion.div>
+        );
+      })()}
 
       {/* Phase indicator dots */}
       <div className="absolute bottom-safe left-0 right-0 flex justify-center">
@@ -266,10 +252,13 @@ export default function StealthInput() {
 
 function ResolvedDateLabel({ date }: { date: { day: number; month: number; sign: { name: string; symbol: string } } }) {
   return (
-    <div className="text-center">
-      <div className="text-white text-3xl mb-1">{date.sign.symbol}</div>
-      <div className="text-white" style={{ fontSize: 18, fontWeight: 100 }}>
+    <div className="text-center" style={{ opacity: 0.55 }}>
+      <div className="text-white" style={{ fontSize: 28, lineHeight: 1, marginBottom: 8 }}>{date.sign.symbol}</div>
+      <div className="text-white" style={{ fontSize: 32, fontWeight: 100, letterSpacing: 1 }}>
         {MONTH_NAMES[date.month - 1]} {date.day}
+      </div>
+      <div className="text-white/40 uppercase tracking-widest" style={{ fontSize: 11, fontWeight: 300, marginTop: 6 }}>
+        {date.sign.name}
       </div>
     </div>
   );

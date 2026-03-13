@@ -86,7 +86,7 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
       store.confirmDifference(result);
 
       if (result.kind === 'ambiguous') {
-        haptics.error(); // warning pattern — two options
+        haptics.ambiguous();
         opts.onAmbiguous?.();
       } else {
         haptics.result();
