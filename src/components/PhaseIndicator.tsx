@@ -11,7 +11,7 @@ export default function PhaseIndicator({ phase }: Props) {
   const activeIndex = PHASES.indexOf(phase);
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 rounded-full border border-white/[6%] bg-white/[2%] px-4 py-2">
       {PHASES.map((p, i) => {
         const isActive = i === activeIndex;
         const isPast = i < activeIndex;
@@ -19,13 +19,13 @@ export default function PhaseIndicator({ phase }: Props) {
         return (
           <motion.div
             key={p}
-            className="w-1 h-1 rounded-full"
+            className="h-1.5 w-1.5 rounded-full"
             animate={{
-              opacity: isActive ? 0.25 : isPast ? 0.10 : 0.06,
+              opacity: isActive ? 0.65 : isPast ? 0.24 : 0.08,
               boxShadow: isActive
-                ? '0 0 6px 2px rgba(255,255,255,0.15)'
+                ? '0 0 8px 2px rgba(255,255,255,0.18)'
                 : 'none',
-              scale: isActive ? 1.2 : 1,
+              scale: isActive ? 1.25 : 1,
               backgroundColor: '#ffffff',
             }}
             transition={{ duration: 0.3 }}

@@ -8,15 +8,15 @@ function Section({ number, title, children }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="mb-14">
-      <div className="flex items-center gap-3 mb-5">
-        <span className="text-white/24 text-[10px] tracking-[3px] tabular-nums">{number}</span>
+    <div className="mb-12">
+      <div className="mb-4 flex items-center gap-3">
+        <span className="font-ui-medium text-[10px] tabular-nums tracking-[3px] text-white/20">{number}</span>
         <div className="h-px flex-1 bg-white/[5%]" />
       </div>
-      <h3 className="font-display-upright text-[26px] text-white/82 leading-none mb-5 pl-1">
+      <h3 className="mb-4 pl-1 font-display-upright text-[24px] leading-none text-white/82">
         {title}
       </h3>
-      <div className="space-y-4 pl-1">
+      <div className="space-y-3.5 pl-1">
         {children}
       </div>
     </div>
@@ -25,7 +25,7 @@ function Section({ number, title, children }: {
 
 function Body({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-white/56 text-[15px] leading-[1.9] font-light">
+    <p className="font-ui-light text-[15px] leading-[1.82] text-white/54">
       {children}
     </p>
   );
@@ -34,27 +34,27 @@ function Body({ children }: { children: React.ReactNode }) {
 function Step({ n, children }: { n: number; children: React.ReactNode }) {
   return (
     <div className="flex gap-4">
-      <span className="text-white/24 text-[13px] font-light tabular-nums shrink-0 pt-0.5 w-5">
+      <span className="font-ui-light w-5 shrink-0 pt-0.5 text-[13px] tabular-nums text-white/24">
         {n}.
       </span>
-      <p className="text-white/58 text-[15px] font-light leading-[1.85]">{children}</p>
+      <p className="font-ui-light text-[15px] leading-[1.8] text-white/58">{children}</p>
     </div>
   );
 }
 
 function GestureRow({ gesture, action }: { gesture: string; action: string }) {
   return (
-    <div className="flex items-baseline gap-4 py-3 border-b border-white/[5%] last:border-0">
-      <span className="text-white/38 text-[13px] font-light w-36 shrink-0">{gesture}</span>
-      <span className="text-white/58 text-[13px] font-light">{action}</span>
+    <div className="flex items-baseline gap-4 border-b border-white/[5%] py-3 last:border-0">
+      <span className="font-ui-light w-32 shrink-0 text-[13px] text-white/34">{gesture}</span>
+      <span className="font-ui-light text-[13px] text-white/58">{action}</span>
     </div>
   );
 }
 
 function Callout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="border-l-2 border-white/[8%] pl-4 py-1">
-      <p className="text-white/40 text-[13px] font-light leading-[1.8]">{children}</p>
+    <div className="rounded-[22px] border border-white/[7%] bg-white/[2%] px-4 py-4">
+      <p className="font-ui-light text-[13px] leading-[1.75] text-white/42">{children}</p>
     </div>
   );
 }
@@ -65,11 +65,11 @@ function StoreLink({ label, url }: { label: string; url: string }) {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center justify-between py-4 border-b border-white/[5%] last:border-0 active:opacity-60"
+      className="flex items-center justify-between border-b border-white/[5%] py-4 last:border-0 active:opacity-60"
       onClick={(e) => e.stopPropagation()}
     >
-      <span className="text-white/60 text-[15px] font-light">{label}</span>
-      <span className="text-white/28 text-[11px] tracking-[2px] uppercase">Open</span>
+      <span className="font-ui-light text-[15px] text-white/60">{label}</span>
+      <span className="font-ui-medium text-[11px] uppercase tracking-[2px] text-white/28">Open</span>
     </a>
   );
 }
@@ -89,7 +89,7 @@ export default function Instructions() {
         title="Quick-Start Guide"
         rightElement={
           <button
-            className="text-white/34 text-[11px] tracking-[3px] uppercase"
+            className="font-ui-medium text-white/34 text-[11px] tracking-[3px] uppercase"
             onTouchStart={(e) => { e.preventDefault(); setScreen('home'); }}
             onClick={() => setScreen('home')}
           >
@@ -100,11 +100,13 @@ export default function Instructions() {
 
       <div className="flex-1 overflow-y-auto px-6 pb-safe-nav pt-4">
 
-        <p className="text-white/30 text-[14px] leading-[1.9] font-light mb-12">
-          Everything you need to perform your first reading.
-          The full presentation script and advanced handling are in the PDF
-          and video sent to your email after purchase.
-        </p>
+        <div className="mb-12 rounded-[30px] border border-white/[7%] bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015))] px-5 py-5">
+          <p className="font-ui-medium text-[10px] uppercase tracking-[4px] text-white/24">Overview</p>
+          <p className="font-ui-light mt-3 max-w-[290px] text-[15px] leading-[1.8] text-white/58">
+            Everything you need for your first reading, reduced to the essentials.
+            The full script and handling notes stay in the purchase materials.
+          </p>
+        </div>
 
         {/* 01 — Notifications */}
         <Section number="01" title="Setting Up Notifications">
@@ -114,7 +116,7 @@ export default function Instructions() {
             receive your results.
           </Body>
 
-          <div className="rounded-[22px] border border-white/[8%] bg-black/20 px-5 mt-2">
+          <div className="mt-1 rounded-[24px] border border-white/[7%] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))] px-5">
             <StoreLink
               label="Ntfy — iOS"
               url="https://apps.apple.com/us/app/ntfy/id1625396347"
@@ -129,10 +131,9 @@ export default function Instructions() {
             Open ntfy and subscribe to any short topic name you choose.
             Pick something personal and non-obvious.
           </Body>
-          <Body>
-            Then open Settings in this app and enter that same topic.
-            Send a real reading to confirm it is working before you perform.
-          </Body>
+          <Callout>
+            Use the same topic in ntfy and in Singularis. Run one real test before performing.
+          </Callout>
         </Section>
 
         {/* 02 — The Presentation */}
@@ -142,9 +143,9 @@ export default function Instructions() {
             their birthday will never be spoken out loud and that you only need
             two totals from them.
           </Body>
-          <Body>Ask them to follow these three steps:</Body>
+          <Body>Guide them through these three steps:</Body>
 
-          <div className="space-y-4 py-2">
+          <div className="space-y-4 py-1">
             <Step n={1}>
               Take your birth month as a number. January is 1, December is 12.
             </Step>
@@ -175,21 +176,21 @@ export default function Instructions() {
             Enter the total from Step 2 first, then the total from Step 3.
           </Body>
 
-          <div className="mt-2">
-            <p className="text-white/20 text-[10px] tracking-[4px] uppercase mb-1">Tapping</p>
+          <div className="mt-2 rounded-[24px] border border-white/[7%] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))] px-4 py-3">
+            <p className="font-ui-medium mb-1 text-[10px] uppercase tracking-[4px] text-white/20">Tapping</p>
             <GestureRow gesture="Bottom half" action="Add 1" />
             <GestureRow gesture="Top half" action="Add 10" />
           </div>
 
-          <div className="mt-2">
-            <p className="text-white/20 text-[10px] tracking-[4px] uppercase mb-1">Correcting</p>
+          <div className="mt-2 rounded-[24px] border border-white/[7%] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))] px-4 py-3">
+            <p className="font-ui-medium mb-1 text-[10px] uppercase tracking-[4px] text-white/20">Correcting</p>
             <GestureRow gesture="Double tap" action="Undo last tap" />
             <GestureRow gesture="Three fingers" action="Reset to zero" />
             <GestureRow gesture="Swipe left" action="Go back to previous number" />
           </div>
 
-          <div className="mt-2">
-            <p className="text-white/20 text-[10px] tracking-[4px] uppercase mb-1">Confirming</p>
+          <div className="mt-2 rounded-[24px] border border-white/[7%] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))] px-4 py-3">
+            <p className="font-ui-medium mb-1 text-[10px] uppercase tracking-[4px] text-white/20">Confirming</p>
             <GestureRow gesture="Long press" action="Confirm and move to next phase" />
             <GestureRow gesture="Swipe down" action="Exit performance mode" />
           </div>
@@ -230,9 +231,9 @@ export default function Instructions() {
           </Body>
         </Section>
 
-        <div className="flex items-center gap-3 mt-4 mb-2">
+        <div className="mb-2 mt-4 flex items-center gap-3">
           <div className="h-px flex-1 bg-white/[4%]" />
-          <p className="text-white/[12%] text-[9px] tracking-[4px] uppercase">Singularis</p>
+          <p className="font-ui-medium text-[9px] uppercase tracking-[4px] text-white/[12%]">Singularis</p>
           <div className="h-px flex-1 bg-white/[4%]" />
         </div>
 

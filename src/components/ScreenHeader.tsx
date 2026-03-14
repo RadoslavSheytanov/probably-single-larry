@@ -20,7 +20,7 @@ export default function ScreenHeader({ title, rightElement, onBack, titleClassNa
       <div className="flex items-center justify-between">
       {onBack ? (
         <button
-          className="text-white/34 text-[11px] tracking-[3px] uppercase w-16 text-left"
+          className="font-ui-medium w-16 text-left text-[11px] uppercase tracking-[3px] text-white/34 transition-colors active:text-white/62"
           onTouchStart={(e) => { e.preventDefault(); onBack(); }}
           onClick={onBack}
         >
@@ -30,7 +30,7 @@ export default function ScreenHeader({ title, rightElement, onBack, titleClassNa
         <div className="w-16" />
       )}
 
-      <h2 className={titleClassName ?? 'font-display-upright uppercase tracking-[6px] text-sm text-white/74'}>
+      <h2 className={titleClassName ?? 'font-display-upright text-[15px] tracking-[5px] uppercase text-white/74'}>
         {title}
       </h2>
 
@@ -38,7 +38,7 @@ export default function ScreenHeader({ title, rightElement, onBack, titleClassNa
         {rightElement ?? null}
       </div>
       </div>
-      <div className="mt-5 h-px bg-white/[6%]" />
+      <div className="mt-5 h-px bg-[linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,0.08),rgba(255,255,255,0))]" />
     </div>
   );
 }

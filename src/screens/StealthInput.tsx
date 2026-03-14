@@ -223,23 +223,21 @@ export default function StealthInput() {
             onTouchEnd={(e) => { e.preventDefault(); dismissWarning(); }}
             onClick={dismissWarning}
           >
-            <div className="text-4xl mb-6 opacity-40">⚠</div>
-            {warningMessage.split('\n').map((line, i) => (
-              <p
-                key={i}
-                className="text-white text-center px-12"
-                style={{
-                  fontSize: i === 0 ? 18 : 13,
-                  fontWeight: i === 0 ? 300 : 300,
-                  opacity: i === 0 ? 0.7 : 0.35,
-                  letterSpacing: 2,
-                  marginBottom: 6,
-                }}
-              >
-                {line}
+            <div className="mx-8 w-full max-w-[320px] rounded-[30px] border border-white/[8%] bg-[linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.015))] px-7 py-8 text-center">
+              <p className="mb-4 text-[10px] uppercase tracking-[4px] text-white/22">
+                Performance interrupted
               </p>
-            ))}
-            <p className="text-white/20 text-xs tracking-widest uppercase mt-10">tap to dismiss</p>
+              {warningMessage.split('\n').map((line, i) => (
+                <p
+                  key={i}
+                  className={`px-2 text-center ${i === 0 ? 'text-[20px] text-white/76' : 'mt-2 text-[13px] leading-[1.75] text-white/38'}`}
+                >
+                  {line}
+                </p>
+              ))}
+              <div className="mx-auto mt-6 h-px w-12 bg-white/[8%]" />
+              <p className="mt-6 text-[10px] uppercase tracking-[4px] text-white/18">Tap to dismiss</p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

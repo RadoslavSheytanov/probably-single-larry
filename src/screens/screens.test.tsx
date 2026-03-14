@@ -87,7 +87,7 @@ beforeEach(() => {
 describe('Home screen', () => {
   it('renders primary action button', () => {
     render(<Home />);
-    expect(screen.getByText('Configure Notifications')).toBeInTheDocument();
+    expect(screen.getByText('To set up push notifications, open Settings.')).toBeInTheDocument();
   });
 
   it('renders "History" nav button', () => {
@@ -136,10 +136,10 @@ describe('Home screen', () => {
     expect(screen.getByText(/July.*17|17.*July/)).toBeInTheDocument();
   });
 
-  it('when ntfyTopic is empty, shows warning message', () => {
+  it('when ntfyTopic is empty, shows notification setup prompt', () => {
     render(<Home />);
     expect(
-      screen.getByText(/watch delivery is still offline/i)
+      screen.getByText(/set up push notifications/i)
     ).toBeInTheDocument();
   });
 
@@ -149,13 +149,13 @@ describe('Home screen', () => {
     });
     render(<Home />);
     expect(
-      screen.queryByText(/watch delivery is still offline/i)
+      screen.queryByText(/set up push notifications/i)
     ).not.toBeInTheDocument();
   });
 
   it('routes primary action to settings when ntfyTopic is empty', () => {
     render(<Home />);
-    fireEvent.click(screen.getByText('Configure Notifications'));
+    fireEvent.click(screen.getByText('To set up push notifications, open Settings.'));
     expect(useStore.getState().screen).toBe('settings');
   });
 
@@ -164,7 +164,7 @@ describe('Home screen', () => {
       settings: { ntfyTopic: 'my-topic', ntfyEnabled: true, hapticFeedback: true },
     });
     render(<Home />);
-    fireEvent.click(screen.getByText('Start Performance'));
+    fireEvent.click(screen.getByText('Performance').closest('button')!);
     expect(useStore.getState().screen).toBe('stealth');
   });
 
@@ -173,7 +173,7 @@ describe('Home screen', () => {
       settings: { ntfyTopic: '', ntfyEnabled: false, hapticFeedback: true },
     });
     render(<Home />);
-    expect(screen.queryByText(/watch delivery is still offline/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/set up push notifications/i)).not.toBeInTheDocument();
   });
 
   it('routes primary action to stealth when push notifications are disabled', () => {
@@ -181,7 +181,7 @@ describe('Home screen', () => {
       settings: { ntfyTopic: '', ntfyEnabled: false, hapticFeedback: true },
     });
     render(<Home />);
-    fireEvent.click(screen.getByText('Start Performance'));
+    fireEvent.click(screen.getByText('Performance').closest('button')!);
     expect(useStore.getState().screen).toBe('stealth');
   });
 });
@@ -288,25 +288,25 @@ describe('ResultPeek screen', () => {
     expect(screen.getByText(/July.*17|July 17/)).toBeInTheDocument();
   });
 
-  it('renders "New Reading" button', () => {
+  it('renders primary result action', () => {
     render(<ResultPeek />);
-    expect(screen.getByText('New Reading')).toBeInTheDocument();
+    expect(screen.getByText('Begin another reading')).toBeInTheDocument();
   });
 
-  it('renders "Home" button', () => {
+  it('renders home action', () => {
     render(<ResultPeek />);
-    expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.getByText('Return Home')).toBeInTheDocument();
   });
 
-  it('clicking "Home" navigates to home', () => {
+  it('clicking home action navigates to home', () => {
     render(<ResultPeek />);
-    fireEvent.click(screen.getByText('Home'));
+    fireEvent.click(screen.getByText('Return Home'));
     expect(useStore.getState().screen).toBe('home');
   });
 
-  it('clicking "New Reading" navigates to stealth', () => {
+  it('clicking primary result action navigates to stealth', () => {
     render(<ResultPeek />);
-    fireEvent.click(screen.getByText('New Reading'));
+    fireEvent.click(screen.getByText('Begin another reading'));
     expect(useStore.getState().screen).toBe('stealth');
   });
 

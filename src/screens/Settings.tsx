@@ -26,7 +26,7 @@ function Toggle({ on, onToggle, label }: { on: boolean; onToggle: () => void; la
 
   return (
     <button
-      className={`relative flex-shrink-0 rounded-full transition-colors ${on ? 'bg-white/70' : 'bg-white/[10%]'}`}
+      className={`relative flex-shrink-0 rounded-full border transition-colors ${on ? 'border-white/[12%] bg-white/70' : 'border-white/[8%] bg-white/[6%]'}`}
       style={{ width: 44, height: 26 }}
       role="switch"
       aria-checked={on}
@@ -35,7 +35,7 @@ function Toggle({ on, onToggle, label }: { on: boolean; onToggle: () => void; la
       onClick={handleClick}
     >
       <motion.div
-        className="absolute top-1 rounded-full bg-white"
+        className="absolute top-1 rounded-full bg-[#0b0b0d]"
         style={{ width: 18, height: 18 }}
         animate={{ left: on ? 23 : 5 }}
         transition={{ type: 'spring', damping: 20, stiffness: 400 }}
@@ -47,7 +47,7 @@ function Toggle({ on, onToggle, label }: { on: boolean; onToggle: () => void; la
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between py-4 border-b border-white/[5%] last:border-b-0">
-      <span className="text-white/60 text-sm font-light">{label}</span>
+      <span className="font-ui-light text-sm text-white/60">{label}</span>
       {children}
     </div>
   );
@@ -113,7 +113,7 @@ export default function Settings({ onDeactivate }: Props) {
         title="Settings"
         rightElement={
           <button
-            className="text-white/34 text-[11px] tracking-[3px] uppercase"
+            className="font-ui-medium text-white/34 text-[11px] tracking-[3px] uppercase"
             onTouchStart={(e) => { e.preventDefault(); handleClose(); }}
             onClick={handleClose}
           >
@@ -123,8 +123,11 @@ export default function Settings({ onDeactivate }: Props) {
       />
 
       <div className="flex-1 overflow-y-auto px-6 pb-safe-nav">
-        <div className="rounded-[24px] border border-white/[8%] bg-black/20 px-5 py-5 mb-4">
-          <p className="text-white/38 text-[10px] tracking-[4px] uppercase mb-3">Notifications</p>
+        <div className="mb-4 rounded-[30px] border border-white/[8%] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))] px-5 py-5">
+          <p className="font-ui-medium mb-2 text-[10px] uppercase tracking-[4px] text-white/34">Notifications</p>
+          <p className="font-ui-light mb-5 max-w-[260px] text-[14px] leading-[1.7] text-white/44">
+            Silent delivery stays invisible when the setup feels calm and deliberate.
+          </p>
           <Row label="Push Notifications">
             <div className="flex items-center justify-center" style={{ minHeight: 44, minWidth: 44 }}>
               <Toggle
@@ -134,9 +137,9 @@ export default function Settings({ onDeactivate }: Props) {
               />
             </div>
           </Row>
-          <p className="text-white/62 text-sm font-light mb-3">ntfy Topic</p>
+          <p className="font-ui-light mb-3 mt-5 text-sm text-white/60">ntfy Topic</p>
           <input
-            className="w-full bg-white/[3%] border border-white/[8%] rounded-2xl px-4 py-3.5 text-white/78 text-sm font-light placeholder-white/[14%] outline-none focus:border-white/18"
+            className="font-ui-light w-full rounded-[22px] border border-white/[7%] bg-black/20 px-4 py-4 text-sm text-white/82 placeholder-white/[16%] outline-none focus:border-white/16"
             placeholder="your-secret-topic"
             value={ntfyInput}
             onChange={(e) => setNtfyInput(e.target.value)}
@@ -145,15 +148,15 @@ export default function Settings({ onDeactivate }: Props) {
             autoCorrect="off"
             spellCheck={false}
           />
-          <p className="text-white/[18%] text-xs mt-3 leading-[1.7]">
+          <p className="font-ui-light mt-3 text-xs leading-[1.75] text-white/[18%]">
             {settings.ntfyEnabled
               ? 'Used for silent delivery through ntfy.sh.'
               : 'Disabled — results stay on your screen only.'}
           </p>
         </div>
 
-        <div className="rounded-[24px] border border-white/[8%] bg-black/20 px-5 py-2 mb-4">
-          <p className="pt-4 text-white/38 text-[10px] tracking-[4px] uppercase">Behaviour</p>
+        <div className="mb-4 rounded-[30px] border border-white/[8%] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))] px-5 py-2">
+          <p className="font-ui-medium pt-4 text-[10px] uppercase tracking-[4px] text-white/34">Behaviour</p>
           <Row label="Haptic Feedback">
             <div className="flex items-center justify-center" style={{ minHeight: 44, minWidth: 44 }}>
               <Toggle
@@ -165,13 +168,13 @@ export default function Settings({ onDeactivate }: Props) {
           </Row>
         </div>
 
-        <div className="rounded-[24px] border border-white/[8%] bg-black/20 px-5 py-5 mb-4">
-          <p className="text-white/38 text-[10px] tracking-[4px] uppercase mb-3">History</p>
+        <div className="mb-4 rounded-[30px] border border-white/[8%] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))] px-5 py-5">
+          <p className="font-ui-medium mb-3 text-[10px] uppercase tracking-[4px] text-white/34">History</p>
           <AnimatePresence mode="wait">
             {confirmClear ? (
               <motion.button
                 key="confirm"
-                className="text-sm font-light tracking-wide text-err"
+                className="font-ui-light text-sm tracking-wide text-err"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -183,7 +186,7 @@ export default function Settings({ onDeactivate }: Props) {
             ) : (
               <motion.button
                 key="clear"
-                className="text-white/60 text-sm font-light"
+                className="font-ui-light text-sm text-white/60"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -196,16 +199,16 @@ export default function Settings({ onDeactivate }: Props) {
           </AnimatePresence>
         </div>
 
-        <div className="rounded-[24px] border border-white/[8%] bg-black/20 px-5 py-5">
-          <p className="text-white/38 text-[10px] tracking-[4px] uppercase mb-3">License</p>
+        <div className="rounded-[30px] border border-white/[8%] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))] px-5 py-5">
+          <p className="font-ui-medium mb-3 text-[10px] uppercase tracking-[4px] text-white/34">License</p>
           {REVIEW_MODE_ENABLED ? (
-            <p className="text-white/42 text-xs">Review build enabled</p>
+            <p className="font-ui-light text-xs text-white/42">Review build enabled</p>
           ) : null}
           {storedEmail ? (
             <>
-              <p className="text-white/42 text-xs mb-3">{storedEmail}</p>
+              <p className="font-ui-light mb-3 text-xs text-white/42">{storedEmail}</p>
               <button
-                className="text-xs tracking-wide font-light text-err"
+                className="font-ui-light text-xs tracking-wide text-err"
                 onTouchStart={(e) => { e.preventDefault(); haptics.error(); onDeactivate?.(); }}
                 onClick={() => { haptics.error(); onDeactivate?.(); }}
               >
@@ -213,16 +216,16 @@ export default function Settings({ onDeactivate }: Props) {
               </button>
             </>
           ) : REVIEW_MODE_ENABLED ? (
-            <p className="text-white/[18%] text-xs mt-3">
+            <p className="font-ui-light mt-3 text-xs text-white/[18%]">
               License activation is bypassed for this deployment.
             </p>
           ) : (
-            <p className="text-white/[18%] text-xs">Not activated</p>
+            <p className="font-ui-light text-xs text-white/[18%]">Not activated</p>
           )}
         </div>
 
         <div className="py-5">
-          <p className="text-white/[12%] text-[10px] tracking-[4px] uppercase">
+          <p className="font-ui-medium text-[10px] uppercase tracking-[4px] text-white/[12%]">
             Singularis v2.0.0 · PWA
           </p>
         </div>

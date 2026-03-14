@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useStore } from '../state/store';
 import { MONTH_NAMES } from '../utils/constants';
+import BottomNav from '../components/BottomNav';
 
 const QUOTE = 'The little things are infinitely the most important.';
 const QUOTE_WORDS = QUOTE.split(' ');
@@ -44,25 +45,26 @@ export default function Home() {
       transition={{ duration: 0.3 }}
     >
       <div className="relative flex-1 overflow-y-auto">
-        <div className="absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.09),transparent_62%)] pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.10),transparent_62%)] pointer-events-none" />
+        <div className="absolute inset-x-0 top-24 h-40 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.035),transparent_72%)] pointer-events-none" />
 
         {/* Header */}
         <div className="flex flex-col items-center pt-safe-header px-6 pb-0">
-          <p className="text-[11px] tracking-[8px] uppercase font-medium text-white/62">
+          <p className="font-ui-medium text-[11px] tracking-[8px] uppercase text-white/58">
             Singularis
           </p>
           <div className="mt-5 w-10 border-t border-white/[10%]" />
         </div>
 
         {/* Hero */}
-        <div className="px-6 pt-10">
+        <div className="px-6 pt-8">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: WORD_EASE }}
           >
             <p
-              className="font-display text-[28px] leading-[1.35] tracking-[0.01em] text-white/82 text-center"
+              className="font-display text-[29px] leading-[1.32] tracking-[0.005em] text-white/82 text-center"
               aria-label={QUOTE}
             >
               {QUOTE_WORDS.map((word, i) => (
@@ -83,13 +85,13 @@ export default function Home() {
             </p>
 
             <motion.div
-              className="mt-5 flex items-center justify-center gap-3"
+              className="mt-6 flex items-center justify-center gap-3"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.28, duration: 0.4 }}
             >
               <div className="h-px w-5 bg-white/[12%]" />
-              <p className="text-[9px] tracking-[3px] uppercase text-white/35">
+              <p className="font-ui-medium text-[9px] tracking-[3px] uppercase text-white/35">
                 Arthur Conan Doyle
               </p>
               <div className="h-px w-5 bg-white/[12%]" />
@@ -98,10 +100,35 @@ export default function Home() {
         </div>
 
         {/* Quick actions */}
-        <div className={`px-6 flex flex-col gap-3 ${hasSupplementaryPanel ? 'pt-8' : 'pt-[72px]'}`}>
+        <div className={`px-6 flex flex-col gap-4 ${hasSupplementaryPanel ? 'pt-12' : 'pt-[104px]'}`}>
           {requiresNtfySetup ? (
             <motion.button
-              className="w-full rounded-[24px] border border-amber-500/18 bg-[linear-gradient(180deg,rgba(255,159,10,0.08),rgba(255,159,10,0.02))] px-5 py-4 text-left active:border-amber-500/28 active:bg-amber-500/[0.09]"
+              className="w-full rounded-[30px] border border-amber-500/14 bg-[linear-gradient(180deg,rgba(255,159,10,0.07),rgba(255,159,10,0.02))] px-6 py-5 text-left active:border-amber-500/24 active:bg-amber-500/[0.09]"
+              whileTap={{ scale: 0.985 }}
+              onTouchStart={(e) => { e.preventDefault(); handlePrimaryAction(); }}
+              onClick={handlePrimaryAction}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.08, duration: 0.4, ease: WORD_EASE }}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="max-w-[252px]">
+                  <p className="font-ui-medium text-[10px] tracking-[3.5px] uppercase text-amber-500/60">
+                    Notifications
+                  </p>
+                  <p className="font-ui-light mt-3 text-[15px] leading-[1.7] text-amber-50/84">
+                    To set up push notifications, open Settings.
+                  </p>
+                </div>
+                <span className="mt-5 text-[18px] text-amber-500/42" aria-hidden="true">
+                  →
+                </span>
+              </div>
+            </motion.button>
+          ) : (
+            <motion.button
+              className="w-full rounded-[32px] border border-white/[10%] bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03))] px-6 py-6 text-left active:bg-white/[10%]"
+              style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' }}
               whileTap={{ scale: 0.985 }}
               onTouchStart={(e) => { e.preventDefault(); handlePrimaryAction(); }}
               onClick={handlePrimaryAction}
@@ -111,47 +138,34 @@ export default function Home() {
             >
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <p className="text-[10px] tracking-[3.5px] uppercase text-amber-500/68">
-                    Notifications
+                  <p className="font-ui-medium text-[11px] uppercase tracking-[4px] text-white/28">
+                    Begin
                   </p>
-                  <p className="mt-1 text-[15px] font-light leading-[1.55] text-amber-50/88">
-                    To set up push notifications, open Settings.
+                  <p className="font-ui-light mt-2 text-[17px] tracking-[0.02em] text-white/82">
+                    Performance
                   </p>
                 </div>
-                <span className="text-[18px] text-amber-500/56" aria-hidden="true">
+                <span className="text-[18px] text-white/38" aria-hidden="true">
                   →
                 </span>
               </div>
-            </motion.button>
-          ) : (
-            <motion.button
-              className="w-full py-[18px] rounded-[24px] border border-white/[12%] bg-white/[6%] text-white/90 text-xs tracking-[5px] uppercase active:bg-white/[10%]"
-              style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' }}
-              whileTap={{ scale: 0.97 }}
-              onTouchStart={(e) => { e.preventDefault(); handlePrimaryAction(); }}
-              onClick={handlePrimaryAction}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.08, duration: 0.4, ease: WORD_EASE }}
-            >
-              Start Performance
             </motion.button>
           )}
         </div>
 
         {/* Guidance */}
-        <div className={`px-6 pb-6 flex flex-col gap-3 ${hasSupplementaryPanel ? 'pt-5' : 'pt-0'}`}>
+        <div className={`px-6 pb-6 flex flex-col gap-3 ${hasSupplementaryPanel ? 'pt-6' : 'pt-0'}`}>
           {lastReading && (
             <motion.div
-              className="px-5 py-4 rounded-[24px] border border-white/[8%] bg-black/20"
+              className="rounded-[28px] border border-white/[7%] bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015))] px-5 py-4"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.28, duration: 0.4, ease: WORD_EASE }}
             >
-              <p className="text-[10px] tracking-[4px] uppercase text-white/40 mb-1.5">
+              <p className="font-ui-medium mb-2 text-[10px] tracking-[4px] uppercase text-white/34">
                 Last reading
               </p>
-              <p className="font-light text-white/80 text-[15px]">
+              <p className="font-ui-light text-[15px] leading-[1.5] text-white/80">
                 {lastReadingLabel()}
               </p>
             </motion.div>
@@ -159,53 +173,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Bottom nav */}
-      <div className="flex items-center justify-between px-6 pb-safe-nav pt-3 border-t border-white/[8%] bg-[#0a0a0a]/95">
-        <motion.button
-          className="flex min-w-[72px] flex-col items-center gap-1.5 text-white/48 active:text-white/78"
-          whileTap={{ scale: 0.94 }}
-          onTouchStart={(e) => { e.preventDefault(); setScreen('history'); }}
-          onClick={() => setScreen('history')}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.36, duration: 0.4 }}
-        >
-          <span className="text-[20px]">◷</span>
-          <span className="text-[10px] tracking-[2.5px] uppercase font-medium">
-            History
-          </span>
-        </motion.button>
-
-        <motion.button
-          className="flex min-w-[72px] flex-col items-center gap-1.5 text-white/48 active:text-white/78"
-          whileTap={{ scale: 0.94 }}
-          onTouchStart={(e) => { e.preventDefault(); setScreen('instructions'); }}
-          onClick={() => setScreen('instructions')}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.36, duration: 0.4 }}
-        >
-          <span className="text-[20px]">✦</span>
-          <span className="text-[10px] tracking-[2.5px] uppercase font-medium">
-            Guide
-          </span>
-        </motion.button>
-
-        <motion.button
-          className="flex min-w-[72px] flex-col items-center gap-1.5 text-white/48 active:text-white/78"
-          whileTap={{ scale: 0.94 }}
-          onTouchStart={(e) => { e.preventDefault(); setScreen('settings'); }}
-          onClick={() => setScreen('settings')}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.36, duration: 0.4 }}
-        >
-          <span className="text-[20px]">⚙</span>
-          <span className="text-[10px] tracking-[2.5px] uppercase font-medium">
-            Settings
-          </span>
-        </motion.button>
-      </div>
+      <BottomNav />
     </motion.div>
   );
 }

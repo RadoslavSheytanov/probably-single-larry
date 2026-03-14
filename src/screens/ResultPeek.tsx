@@ -58,7 +58,8 @@ export default function ResultPeek() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="absolute inset-x-0 top-0 h-56 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.1),transparent_62%)] pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-64 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.1),transparent_62%)] pointer-events-none" />
+      <div className="absolute inset-x-0 top-24 h-44 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.035),transparent_74%)] pointer-events-none" />
 
       <motion.div
         className="flex-1 flex flex-col items-center justify-center px-6"
@@ -66,52 +67,61 @@ export default function ResultPeek() {
         animate={{ y: 0, scale: 1, opacity: 1 }}
         transition={{ type: 'spring', damping: 25, stiffness: 120, mass: 0.8, delay: 0.15 }}
       >
-        <div className="mb-6 rounded-full border border-white/[8%] bg-white/[3%] px-4 py-2.5">
-          <span className="block text-white/40 text-[18px] leading-none text-center">
-            {textSymbol(sign.symbol)}
-          </span>
-        </div>
+        <p className="font-ui-medium mb-6 text-[10px] uppercase tracking-[4px] text-white/24">
+          Reading complete
+        </p>
 
-        <p className="text-white text-[52px] font-thin mb-2 text-center leading-none">
+        <span className="mb-6 block text-center text-[34px] leading-none text-white/46">
+          {textSymbol(sign.symbol)}
+        </span>
+
+        <p className="font-ui-light mb-2 text-center text-[56px] leading-none text-white">
           {MONTH_NAMES[date.month - 1]} {date.day}
         </p>
 
-        <p className="font-display-upright text-white/72 text-[20px] tracking-[6px] uppercase mt-5">
+        <p className="mt-5 font-display-upright text-[22px] uppercase tracking-[6px] text-white/72">
           {sign.name}
         </p>
 
         <div className="mt-5 h-px w-14 bg-white/[8%]" />
 
-        <p className="text-white/[16%] text-[11px] tracking-[4px] uppercase mt-5">
+        <p className="font-ui-medium mt-5 text-[11px] uppercase tracking-[4px] text-white/[16%]">
           {sign.element} · {sign.dateRange}
         </p>
       </motion.div>
 
       <motion.div
-        className="flex flex-col gap-3 px-6 pb-safe-nav"
+        className="px-6 pb-safe-nav"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <motion.button
-          className="w-full py-[18px] rounded-[24px] border border-white/[12%] bg-white/[6%] text-white/88 text-xs tracking-[5px] uppercase font-light"
-          style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' }}
-          whileTap={{ scale: 0.97 }}
-          onTouchStart={(e) => { e.preventDefault(); handleNewReading(); }}
-          onClick={handleNewReading}
-        >
-          New Reading
-        </motion.button>
+        <div className="rounded-[30px] border border-white/[8%] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))] p-3">
+          <motion.button
+            className="w-full rounded-[24px] border border-white/[10%] bg-white/[6%] px-5 py-4 text-left"
+            style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' }}
+            whileTap={{ scale: 0.985 }}
+            onTouchStart={(e) => { e.preventDefault(); handleNewReading(); }}
+            onClick={handleNewReading}
+          >
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="font-ui-medium text-[10px] uppercase tracking-[3.5px] text-white/34">Continue</p>
+                <p className="font-ui-light mt-2 text-[17px] text-white/88">Begin another reading</p>
+              </div>
+              <span className="text-[18px] text-white/40" aria-hidden="true">→</span>
+            </div>
+          </motion.button>
 
-        <motion.button
-          className="w-full py-[18px] rounded-[24px] border border-white/[8%] bg-black/20 text-white/46 text-xs tracking-[4px] uppercase"
-          style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)' }}
-          whileTap={{ scale: 0.97 }}
-          onTouchStart={(e) => { e.preventDefault(); handleHome(); }}
-          onClick={handleHome}
-        >
-          Home
-        </motion.button>
+          <motion.button
+            className="font-ui-medium w-full px-5 py-4 text-[11px] uppercase tracking-[3.5px] text-white/34"
+            whileTap={{ scale: 0.985 }}
+            onTouchStart={(e) => { e.preventDefault(); handleHome(); }}
+            onClick={handleHome}
+          >
+            Return Home
+          </motion.button>
+        </div>
       </motion.div>
     </motion.div>
   );

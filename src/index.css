@@ -70,6 +70,16 @@
     font-weight: 400;
   }
 
+  .font-ui-light {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-weight: 300;
+  }
+
+  .font-ui-medium {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    font-weight: 500;
+  }
+
 }
 
 html,
