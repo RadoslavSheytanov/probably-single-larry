@@ -11,12 +11,18 @@ import History from './screens/History';
 import Instructions from './screens/Instructions';
 
 type AuthState = 'checking' | 'active' | 'needs-auth';
+const REVIEW_MODE_ENABLED = import.meta.env.VITE_REVIEW_MODE === 'true';
 
 export default function App() {
   const screen = useStore((s) => s.screen);
   const [authState, setAuthState] = useState<AuthState>('checking');
 
   useEffect(() => {
+    if (REVIEW_MODE_ENABLED) {
+      setAuthState('active');
+      return;
+    }
+
     validateStoredLicense().then((valid) => {
       setAuthState(valid ? 'active' : 'needs-auth');
     });

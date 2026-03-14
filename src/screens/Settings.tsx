@@ -5,6 +5,8 @@ import { getStoredEmail } from '../services/license';
 import { haptics } from '../services/haptics';
 import ScreenHeader from '../components/ScreenHeader';
 
+const REVIEW_MODE_ENABLED = import.meta.env.VITE_REVIEW_MODE === 'true';
+
 function Toggle({ on, onToggle, label }: { on: boolean; onToggle: () => void; label: string }) {
   const touchHandled = useRef(false);
 
@@ -196,6 +198,9 @@ export default function Settings({ onDeactivate }: Props) {
 
         <div className="rounded-[24px] border border-white/[8%] bg-black/20 px-5 py-5">
           <p className="text-white/38 text-[10px] tracking-[4px] uppercase mb-3">License</p>
+          {REVIEW_MODE_ENABLED ? (
+            <p className="text-white/42 text-xs">Review build enabled</p>
+          ) : null}
           {storedEmail ? (
             <>
               <p className="text-white/42 text-xs mb-3">{storedEmail}</p>
@@ -207,6 +212,10 @@ export default function Settings({ onDeactivate }: Props) {
                 Deactivate
               </button>
             </>
+          ) : REVIEW_MODE_ENABLED ? (
+            <p className="text-white/[18%] text-xs mt-3">
+              License activation is bypassed for this deployment.
+            </p>
           ) : (
             <p className="text-white/[18%] text-xs">Not activated</p>
           )}

@@ -15,6 +15,16 @@ npm run dev
 
 Copy `.env.example` to `.env.local` and fill in the values. See `.env.example` for documentation.
 
+## Quick Review Deploy
+
+If you want to share the app for stakeholder review without wiring up Gumroad yet:
+
+1. Deploy the root Vite app to Vercel
+2. Set `VITE_REVIEW_MODE=true` in the Vercel project environment variables
+3. Redeploy
+
+That build bypasses the license gate so reviewers can open the app directly. Remove `VITE_REVIEW_MODE` once you are ready to use the real activation flow.
+
 ## Commands
 
 | Command | Description |
