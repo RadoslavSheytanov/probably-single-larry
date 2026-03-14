@@ -27,11 +27,6 @@ export default function Home() {
     return `${textSymbol(sign.symbol)} ${MONTH_NAMES[month - 1]} ${day} · ${sign.name}`;
   }
 
-  function primaryActionLabel() {
-    if (requiresNtfySetup) return 'Open Settings';
-    return 'Start Performance';
-  }
-
   function handlePrimaryAction() {
     if (requiresNtfySetup) {
       setScreen('settings');
@@ -119,8 +114,8 @@ export default function Home() {
                   <p className="text-[10px] tracking-[3.5px] uppercase text-amber-500/68">
                     Notifications
                   </p>
-                  <p className="mt-1 text-[15px] font-light text-amber-50/88">
-                    Open Settings
+                  <p className="mt-1 text-[15px] font-light leading-[1.55] text-amber-50/88">
+                    To set up push notifications, open Settings.
                   </p>
                 </div>
                 <span className="text-[18px] text-amber-500/56" aria-hidden="true">
@@ -139,30 +134,13 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.08, duration: 0.4, ease: WORD_EASE }}
             >
-              {primaryActionLabel()}
+              Start Performance
             </motion.button>
           )}
         </div>
 
         {/* Guidance */}
         <div className={`px-6 pb-6 flex flex-col gap-3 ${hasSupplementaryPanel ? 'pt-5' : 'pt-0'}`}>
-          {requiresNtfySetup && (
-            <motion.div
-              className="rounded-[24px] border border-amber-500/22 bg-amber-500/[5%] px-5 py-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.24, duration: 0.4 }}
-            >
-              <p className="text-[10px] tracking-[3px] uppercase text-amber-500/70 mb-2">
-                Before you perform
-              </p>
-              <p className="font-light text-[13px] leading-[1.7] text-amber-100/75">
-                Your watch delivery is still offline. Add your private ntfy topic in Settings
-                before using this live.
-              </p>
-            </motion.div>
-          )}
-
           {lastReading && (
             <motion.div
               className="px-5 py-4 rounded-[24px] border border-white/[8%] bg-black/20"
