@@ -47,8 +47,8 @@ interface AppState {
 
 const DEFAULT_SETTINGS: AppSettings = {
   ntfyTopic: '',
-  ntfyEnabled: true,
-  hapticFeedback: true,
+  ntfyEnabled: false,
+  hapticFeedback: false,
 };
 
 const DEFAULT_STEALTH: StealthState = {
