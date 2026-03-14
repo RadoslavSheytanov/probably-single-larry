@@ -28,7 +28,7 @@ export default function Home() {
   }
 
   function primaryActionLabel() {
-    if (requiresNtfySetup) return 'Configure Notifications';
+    if (requiresNtfySetup) return 'Open Settings';
     return 'Start Performance';
   }
 
@@ -104,18 +104,44 @@ export default function Home() {
 
         {/* Quick actions */}
         <div className={`px-6 flex flex-col gap-3 ${hasSupplementaryPanel ? 'pt-8' : 'pt-[72px]'}`}>
-          <motion.button
-            className="w-full py-[18px] rounded-[24px] border border-white/[12%] bg-white/[6%] text-white/90 text-xs tracking-[5px] uppercase active:bg-white/[10%]"
-            style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' }}
-            whileTap={{ scale: 0.97 }}
-            onTouchStart={(e) => { e.preventDefault(); handlePrimaryAction(); }}
-            onClick={handlePrimaryAction}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.08, duration: 0.4, ease: WORD_EASE }}
-          >
-            {primaryActionLabel()}
-          </motion.button>
+          {requiresNtfySetup ? (
+            <motion.button
+              className="w-full rounded-[24px] border border-amber-500/18 bg-[linear-gradient(180deg,rgba(255,159,10,0.08),rgba(255,159,10,0.02))] px-5 py-4 text-left active:border-amber-500/28 active:bg-amber-500/[0.09]"
+              whileTap={{ scale: 0.985 }}
+              onTouchStart={(e) => { e.preventDefault(); handlePrimaryAction(); }}
+              onClick={handlePrimaryAction}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.08, duration: 0.4, ease: WORD_EASE }}
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-[10px] tracking-[3.5px] uppercase text-amber-500/68">
+                    Notifications
+                  </p>
+                  <p className="mt-1 text-[15px] font-light text-amber-50/88">
+                    Open Settings
+                  </p>
+                </div>
+                <span className="text-[18px] text-amber-500/56" aria-hidden="true">
+                  →
+                </span>
+              </div>
+            </motion.button>
+          ) : (
+            <motion.button
+              className="w-full py-[18px] rounded-[24px] border border-white/[12%] bg-white/[6%] text-white/90 text-xs tracking-[5px] uppercase active:bg-white/[10%]"
+              style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)' }}
+              whileTap={{ scale: 0.97 }}
+              onTouchStart={(e) => { e.preventDefault(); handlePrimaryAction(); }}
+              onClick={handlePrimaryAction}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.08, duration: 0.4, ease: WORD_EASE }}
+            >
+              {primaryActionLabel()}
+            </motion.button>
+          )}
         </div>
 
         {/* Guidance */}
