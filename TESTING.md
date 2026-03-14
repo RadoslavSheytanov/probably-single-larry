@@ -38,7 +38,7 @@ npx vitest run --coverage
 | `src/services/ntfy.test.ts` | Push notification formatting (ASCII-only title, plain-text body), send to ntfy.sh, ambiguous date formatting |
 | `src/services/haptics.test.ts` | Vibration pattern dispatch for each haptic event (tapOne, tapTen, confirm, error, result, ambiguous, undo, back, exit, resolved) |
 | `src/components/components.test.tsx` | PhaseIndicator: renders 4 dots, accepts all phase values. ScreenHeader: title text, rightElement slot, back arrow rendering, onBack callback |
-| `src/screens/screens.test.tsx` | Home, History, PracticeMode, ResultPeek: renders key elements, navigation actions, conditional content (last reading, ntfy warning, empty history) |
+| `src/screens/screens.test.tsx` | Home, History, and ResultPeek: renders key elements, navigation actions, conditional content (last reading, ntfy warning, empty history) |
 | `src/integration/flow.test.ts` | Full store-level performance flows without rendering React: unambiguous performance, undo, three-finger reset, go-back, ambiguous resolution, error states, history accumulation, 100-entry cap |
 
 ---

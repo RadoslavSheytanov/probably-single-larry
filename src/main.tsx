@@ -3,8 +3,10 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 
+const REVIEW_MODE_ENABLED = import.meta.env.VITE_REVIEW_MODE === 'true'
+
 // ── Production hardening ──────────────────────────────────────────────────────
-if (import.meta.env.PROD) {
+if (import.meta.env.PROD && !REVIEW_MODE_ENABLED) {
   // Domain lock — update ALLOWED_DOMAINS before deploying
   const ALLOWED_DOMAINS = ['singularis.app', 'www.singularis.app'];
   if (!ALLOWED_DOMAINS.includes(location.hostname)) {

@@ -70,7 +70,6 @@ probably-single-larry/           ← repo root (branch: develop)
 │   │   ├── ResultPeek.tsx
 │   │   ├── Settings.tsx         # onDeactivate prop → clearLicense() → needs-auth
 │   │   ├── History.tsx
-│   │   └── PracticeMode.tsx
 │   ├── components/
 │   │   └── PhaseIndicator.tsx
 │   ├── services/
