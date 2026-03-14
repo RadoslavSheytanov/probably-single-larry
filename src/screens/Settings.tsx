@@ -157,7 +157,7 @@ export default function Settings({ onDeactivate }: Props) {
 
         <div className="mb-4 rounded-[30px] border border-white/[8%] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))] px-5 py-2">
           <p className="font-ui-medium pt-4 text-[10px] uppercase tracking-[4px] text-white/34">Behaviour</p>
-          <Row label="Haptic Feedback">
+          <Row label="Haptic Feedback (Android Only)">
             <div className="flex items-center justify-center" style={{ minHeight: 44, minWidth: 44 }}>
               <Toggle
                 on={settings.hapticFeedback}
