@@ -74,6 +74,7 @@
       <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_1" result="shape"/>
     </filter>
   </defs>
+  <rect width="1024" height="1024" fill="#0A0B10"/>
   <g filter="url(#plateShadow)">
     <rect x="40" y="40" width="944" height="944" rx="212" fill="url(#plateGlow)"/>
     <rect x="42" y="42" width="940" height="940" rx="210" stroke="url(#plateEdge)" stroke-width="4"/>
