@@ -126,7 +126,7 @@ export default function Settings({ onDeactivate }: Props) {
         <div className="mb-4 rounded-[30px] border border-white/[8%] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))] px-5 py-5">
           <p className="font-ui-medium mb-2 text-[10px] uppercase tracking-[4px] text-white/34">Notifications</p>
           <p className="font-ui-light mb-5 max-w-[260px] text-[14px] leading-[1.7] text-white/44">
-            Silent delivery stays invisible when the setup feels calm and deliberate.
+            Enable notifications, then add your ntfy topic name below.
           </p>
           <Row label="Push Notifications">
             <div className="flex items-center justify-center" style={{ minHeight: 44, minWidth: 44 }}>
