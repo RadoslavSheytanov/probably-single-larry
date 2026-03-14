@@ -38,13 +38,7 @@
     </filter>
   </defs>
 
-  <rect width="1024" height="1024" fill="#06070A"/>
-  <rect width="1024" height="1024" fill="url(#glow)"/>
-
   <g filter="url(#shadow)">
-    <rect x="140" y="128" width="744" height="744" rx="132" fill="url(#bgGrad)"/>
-    <rect x="142.5" y="130.5" width="739" height="739" rx="129.5" stroke="#2A2C35" stroke-opacity="0.85" stroke-width="5"/>
-
     <path d="M258 436C329 348 410 305 512 305C614 305 695 348 766 436" stroke="url(#metalDark)" stroke-width="5" stroke-linecap="round"/>
     <path d="M253 538C333 616 420 655 512 655C604 655 691 616 771 538" stroke="url(#metalLight)" stroke-width="6" stroke-linecap="round"/>
     <path d="M277 610C346 651 424 675 512 675C600 675 678 651 747 610" stroke="#1B1C24" stroke-width="3.2" stroke-linecap="round" opacity="0.92"/>

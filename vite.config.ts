@@ -9,7 +9,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icons/*.png'],
+      includeAssets: ['icons/*.png', 'icons/apple-touch-icon.png'],
       manifest: {
         name: 'Singularis',
         short_name: 'Singularis',
