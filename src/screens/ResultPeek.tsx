@@ -17,7 +17,6 @@ export default function ResultPeek() {
 
   const date: ResolvedDate | null = resolvedDate;
 
-  // Record to history on mount (only once)
   useEffect(() => {
     if (!date || !engineResult) return;
     addReading({
@@ -26,9 +25,7 @@ export default function ResultPeek() {
       result: engineResult,
       resolvedDate: date,
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // Intentional: records exactly once on mount — component only mounts when result is fresh
-  }, []);
+  }, [addReading, date, engineResult]);
 
   const handleNewReading = useCallback(() => {
     resetStealth();

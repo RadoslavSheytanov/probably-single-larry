@@ -53,15 +53,13 @@ export default function StealthInput() {
   }, []);
 
   useEffect(() => {
-    if (settings.displayMode !== 'fade-out') {
-      setStartupOverlayVisible(false);
+    if (settings.displayMode !== 'fade-out' || !startupOverlayVisible) {
       return;
     }
 
-    setStartupOverlayVisible(true);
     const timer = window.setTimeout(() => setStartupOverlayVisible(false), 1700);
     return () => window.clearTimeout(timer);
-  }, [settings.displayMode]);
+  }, [settings.displayMode, startupOverlayVisible]);
 
   const displayValue = phase === 'ANCHOR' || phase === 'DIFFERENCE'
     ? (phase === 'ANCHOR' ? anchorValue : differenceValue)
@@ -201,7 +199,7 @@ export default function StealthInput() {
         </motion.div>
       )}
 
-      {startupOverlayVisible && settings.displayMode === 'fade-out' && (
+      {settings.displayMode === 'fade-out' && startupOverlayVisible && (
         <motion.div
           className="absolute inset-0 flex flex-col items-center justify-center bg-black text-center pointer-events-none select-none"
           initial={{ opacity: 0.82 }}

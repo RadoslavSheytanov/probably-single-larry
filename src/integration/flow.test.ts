@@ -53,7 +53,7 @@ beforeEach(() => {
 
 describe('Flow 1: Complete unambiguous performance (A=24, D=10 → July 17, Cancer)', () => {
   it('reaches COMPUTED with correct resolvedDate', () => {
-    const { incrementAnchor, confirmAnchor, incrementDifference, confirmDifference } =
+    const { incrementAnchor, confirmAnchor } =
       useStore.getState();
 
     useStore.getState().chooseDominantPart('DAY');

@@ -17,11 +17,10 @@ const REVIEW_MODE_ENABLED = import.meta.env.VITE_REVIEW_MODE === 'true';
 export default function App() {
   const screen = useStore((s) => s.screen);
   const iosHaptics = useStore((s) => s.settings.iosHaptics);
-  const [authState, setAuthState] = useState<AuthState>('checking');
+  const [authState, setAuthState] = useState<AuthState>(REVIEW_MODE_ENABLED ? 'active' : 'checking');
 
   useEffect(() => {
     if (REVIEW_MODE_ENABLED) {
-      setAuthState('active');
       return;
     }
 

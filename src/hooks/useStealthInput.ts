@@ -46,8 +46,6 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
   useEffect(() => { differenceRef.current = differenceValue; }, [differenceValue]);
   useEffect(() => { hapticRef.current = hapticEnabled; }, [hapticEnabled]);
 
-  // Stable refs for opts callbacks — prevents opts from being a useEffect dependency
-  // (which would cause touch listeners to detach/reattach on every render)
   const onComparisonChoiceRef = useRef(opts.onComparisonChoice);
   const onAnchorTooLowRef = useRef(opts.onAnchorTooLow);
   const onErrorRef = useRef(opts.onError);
@@ -57,15 +55,25 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
   const onGoBackRef = useRef(opts.onGoBack);
   const onTapRef = useRef(opts.onTap);
 
-  // Update refs every render so callbacks are always current
-  onComparisonChoiceRef.current = opts.onComparisonChoice;
-  onAnchorTooLowRef.current = opts.onAnchorTooLow;
-  onErrorRef.current = opts.onError;
-  onResultRef.current = opts.onResult;
-  onAmbiguousRef.current = opts.onAmbiguous;
-  onExitRef.current = opts.onExit;
-  onGoBackRef.current = opts.onGoBack;
-  onTapRef.current = opts.onTap;
+  useEffect(() => {
+    onComparisonChoiceRef.current = opts.onComparisonChoice;
+    onAnchorTooLowRef.current = opts.onAnchorTooLow;
+    onErrorRef.current = opts.onError;
+    onResultRef.current = opts.onResult;
+    onAmbiguousRef.current = opts.onAmbiguous;
+    onExitRef.current = opts.onExit;
+    onGoBackRef.current = opts.onGoBack;
+    onTapRef.current = opts.onTap;
+  }, [
+    opts.onComparisonChoice,
+    opts.onAnchorTooLow,
+    opts.onError,
+    opts.onResult,
+    opts.onAmbiguous,
+    opts.onExit,
+    opts.onGoBack,
+    opts.onTap,
+  ]);
 
   // Conditional haptic helper — respects the hapticFeedback setting
   const h = useCallback((fn: () => void) => {
@@ -195,7 +203,9 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
 
       // Two-finger swipe down exits performance mode.
       if (fingerCount.current === 2 && deltaY > 80 && Math.abs(deltaX) < 80 && elapsed < 500) {
-        hapticRef.current && haptics.exit();
+        if (hapticRef.current) {
+          haptics.exit();
+        }
         onExitRef.current?.();
         return;
       }
@@ -252,7 +262,6 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
       el.removeEventListener('touchmove', onTouchMove);
       clearLongPressTimer();
     };
-    // opts callbacks are now refs — removed from deps to prevent listener re-attach on every render
   }, [containerRef, handleTap, handleConfirm, handleUndo, handleReset, handleGoBack]);
 
   // Keyboard shortcuts for desktop testing

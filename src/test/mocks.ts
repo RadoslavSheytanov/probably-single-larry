@@ -1,4 +1,6 @@
+import React from 'react';
 import { vi } from 'vitest';
+import { useStore } from '../state/store';
 
 // Mock framer-motion so animations don't interfere with tests
 vi.mock('framer-motion', () => ({
@@ -7,15 +9,27 @@ vi.mock('framer-motion', () => ({
       // Return a simple div/button/span forwarder for motion.div, motion.button, etc.
       const tag = String(prop);
       return ({ children, ...props }: React.HTMLAttributes<HTMLElement> & { children?: React.ReactNode }) => {
-        const React = require('react');
         // Remove framer-motion-specific props
-        const { initial, animate, exit, transition, whileTap, variants, ...domProps } = props as Record<string, unknown>;
+        const {
+          initial,
+          animate,
+          exit,
+          transition,
+          whileTap,
+          variants,
+          ...domProps
+        } = props as Record<string, unknown>;
+        void initial;
+        void animate;
+        void exit;
+        void transition;
+        void whileTap;
+        void variants;
         return React.createElement(tag, domProps, children);
       };
     }
   }),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => {
-    const React = require('react');
     return React.createElement(React.Fragment, null, children);
   },
 }));
@@ -43,7 +57,6 @@ export function mockFetch(response: object = {}) {
 
 // Helper: reset store to clean state
 export function resetStore() {
-  const { useStore } = require('../state/store');
   useStore.setState({
     screen: 'home',
     stealth: {
