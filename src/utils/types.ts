@@ -1,4 +1,6 @@
-export type Phase = 'ANCHOR' | 'DIFFERENCE' | 'COMPUTED' | 'RESOLVING';
+export type DominantDatePart = 'DAY' | 'MONTH';
+
+export type Phase = 'COMPARISON' | 'ANCHOR' | 'DIFFERENCE' | 'COMPUTED';
 
 export type Screen = 'home' | 'stealth' | 'result' | 'settings' | 'history' | 'instructions';
 
@@ -32,4 +34,6 @@ export interface AppSettings {
   ntfyTopic: string;
   ntfyEnabled: boolean;
   hapticFeedback: boolean;
+  displayMode: 'fade-out' | 'muted-black';
+  iosHaptics: boolean;
 }

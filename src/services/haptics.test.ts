@@ -10,6 +10,11 @@ beforeEach(() => {
 });
 
 describe('haptics', () => {
+  it('comparison calls navigator.vibrate with 12', () => {
+    haptics.comparison();
+    expect(navigator.vibrate).toHaveBeenCalledWith(12);
+  });
+
   it('tapOne calls navigator.vibrate with 10', () => {
     haptics.tapOne();
     expect(navigator.vibrate).toHaveBeenCalledWith(10);
@@ -59,6 +64,11 @@ describe('haptics', () => {
     haptics.result();
     expect(navigator.vibrate).toHaveBeenCalledWith([8, 30, 12, 30, 20]);
   });
+
+  it('configureIosFallback updates the fallback toggle without throwing', () => {
+    expect(() => haptics.configureIosFallback(false)).not.toThrow();
+    expect(() => haptics.configureIosFallback(true)).not.toThrow();
+  });
 });
 
 describe('haptics without navigator.vibrate', () => {
@@ -72,6 +82,10 @@ describe('haptics without navigator.vibrate', () => {
 
   it('tapOne does not throw when navigator.vibrate is undefined', () => {
     expect(() => haptics.tapOne()).not.toThrow();
+  });
+
+  it('comparison does not throw when navigator.vibrate is undefined', () => {
+    expect(() => haptics.comparison()).not.toThrow();
   });
 
   it('tapTen does not throw when navigator.vibrate is undefined', () => {

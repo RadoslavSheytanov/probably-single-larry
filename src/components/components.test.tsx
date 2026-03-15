@@ -47,8 +47,8 @@ describe('PhaseIndicator', () => {
     expect(() => render(<PhaseIndicator phase="DIFFERENCE" />)).not.toThrow();
   });
 
-  it('renders with RESOLVING phase without throwing', () => {
-    expect(() => render(<PhaseIndicator phase="RESOLVING" />)).not.toThrow();
+  it('renders with COMPARISON phase without throwing', () => {
+    expect(() => render(<PhaseIndicator phase="COMPARISON" />)).not.toThrow();
   });
 
   it('renders with COMPUTED phase without throwing', () => {
@@ -56,7 +56,7 @@ describe('PhaseIndicator', () => {
   });
 
   it('all 4 phase values are accepted', () => {
-    const phases: Phase[] = ['ANCHOR', 'DIFFERENCE', 'COMPUTED', 'RESOLVING'];
+    const phases: Phase[] = ['COMPARISON', 'ANCHOR', 'DIFFERENCE', 'COMPUTED'];
     for (const phase of phases) {
       const { unmount } = render(<PhaseIndicator phase={phase} />);
       unmount();

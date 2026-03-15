@@ -53,6 +53,29 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
+function ChoiceButton({
+  active,
+  onSelect,
+  title,
+  subtitle,
+}: {
+  active: boolean;
+  onSelect: () => void;
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <button
+      className={`w-full rounded-[22px] border px-4 py-4 text-left transition-colors ${active ? 'border-white/16 bg-white/[0.07]' : 'border-white/[7%] bg-white/[0.02]'}`}
+      onTouchStart={(e) => { e.preventDefault(); onSelect(); }}
+      onClick={onSelect}
+    >
+      <p className="font-ui-medium text-[11px] uppercase tracking-[3px] text-white/58">{title}</p>
+      <p className="font-ui-light mt-2 text-[13px] leading-[1.7] text-white/40">{subtitle}</p>
+    </button>
+  );
+}
+
 interface Props {
   onDeactivate?: () => void;
 }
@@ -157,7 +180,24 @@ export default function Settings({ onDeactivate }: Props) {
 
         <div className="mb-4 rounded-[30px] border border-white/[8%] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))] px-5 py-2">
           <p className="font-ui-medium pt-4 text-[10px] uppercase tracking-[4px] text-white/34">Behaviour</p>
-          <Row label="Haptic Feedback (Android Only)">
+          <div className="border-b border-white/[5%] py-4">
+            <p className="font-ui-light text-sm text-white/60">Display Mode</p>
+            <div className="mt-4 grid gap-3">
+              <ChoiceButton
+                active={settings.displayMode === 'fade-out'}
+                title="Fade Out"
+                subtitle="Default. Show brief white text, then fade to black."
+                onSelect={() => updateSettings({ displayMode: 'fade-out' })}
+              />
+              <ChoiceButton
+                active={settings.displayMode === 'muted-black'}
+                title="Muted Black"
+                subtitle="No startup text or animation. Screen stays dimmed."
+                onSelect={() => updateSettings({ displayMode: 'muted-black' })}
+              />
+            </div>
+          </div>
+          <Row label="Haptic Feedback">
             <div className="flex items-center justify-center" style={{ minHeight: 44, minWidth: 44 }}>
               <Toggle
                 on={settings.hapticFeedback}
@@ -166,6 +206,18 @@ export default function Settings({ onDeactivate }: Props) {
               />
             </div>
           </Row>
+          <Row label="Experimental iPhone Haptics">
+            <div className="flex items-center justify-center" style={{ minHeight: 44, minWidth: 44 }}>
+              <Toggle
+                on={settings.iosHaptics}
+                label="Toggle experimental iPhone haptics"
+                onToggle={() => updateSettings({ iosHaptics: !settings.iosHaptics })}
+              />
+            </div>
+          </Row>
+          <p className="font-ui-light mb-4 mt-1 text-xs leading-[1.75] text-white/[18%]">
+            Android uses vibration normally. iPhone support is a best-effort Safari workaround and may vary by iOS version.
+          </p>
         </div>
 
         <div className="mb-4 rounded-[30px] border border-white/[8%] bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))] px-5 py-5">

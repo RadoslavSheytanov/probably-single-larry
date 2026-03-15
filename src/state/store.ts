@@ -7,10 +7,12 @@ import type {
   ResolvedDate,
   Reading,
   AppSettings,
+  DominantDatePart,
 } from '../utils/types';
 
 interface StealthState {
   phase: Phase;
+  dominantPart: DominantDatePart | null;
   anchorValue: number;
   differenceValue: number;
   lastAdded: number;
@@ -25,6 +27,7 @@ interface AppState {
 
   // Stealth input state
   stealth: StealthState;
+  chooseDominantPart: (part: DominantDatePart) => void;
   incrementAnchor: (amount: number) => void;
   incrementDifference: (amount: number) => void;
   undoLast: () => void;
@@ -49,10 +52,13 @@ const DEFAULT_SETTINGS: AppSettings = {
   ntfyTopic: '',
   ntfyEnabled: false,
   hapticFeedback: false,
+  displayMode: 'fade-out',
+  iosHaptics: true,
 };
 
 const DEFAULT_STEALTH: StealthState = {
-  phase: 'ANCHOR',
+  phase: 'COMPARISON',
+  dominantPart: null,
   anchorValue: 0,
   differenceValue: 0,
   lastAdded: 0,
@@ -69,6 +75,20 @@ export const useStore = create<AppState>()(
 
       // ── Stealth input ───────────────────────────────────────────────────
       stealth: { ...DEFAULT_STEALTH },
+
+      chooseDominantPart: (part) =>
+        set((s) => ({
+          stealth: {
+            ...s.stealth,
+            phase: 'ANCHOR',
+            dominantPart: part,
+            anchorValue: 0,
+            differenceValue: 0,
+            lastAdded: 0,
+            engineResult: null,
+            resolvedDate: null,
+          },
+        })),
 
       incrementAnchor: (amount) =>
         set((s) => ({
@@ -112,10 +132,30 @@ export const useStore = create<AppState>()(
       goBackPhase: () =>
         set((s) => {
           if (s.stealth.phase === 'DIFFERENCE') {
-            // Go back to ANCHOR, reset everything
-            return { stealth: { ...DEFAULT_STEALTH } };
+            return {
+              stealth: {
+                ...s.stealth,
+                phase: 'ANCHOR',
+                anchorValue: 0,
+                differenceValue: 0,
+                lastAdded: 0,
+                engineResult: null,
+                resolvedDate: null,
+              },
+            };
           }
-          // In ANCHOR: same as full reset
+          if (s.stealth.phase === 'ANCHOR') {
+            return {
+              stealth: {
+                ...s.stealth,
+                anchorValue: 0,
+                differenceValue: 0,
+                lastAdded: 0,
+                engineResult: null,
+                resolvedDate: null,
+              },
+            };
+          }
           return { stealth: { ...DEFAULT_STEALTH } };
         }),
 
@@ -136,7 +176,7 @@ export const useStore = create<AppState>()(
         set((s) => ({
           stealth: {
             ...s.stealth,
-            phase: result.kind === 'ambiguous' ? 'RESOLVING' : 'COMPUTED',
+            phase: result.kind === 'error' ? s.stealth.phase : 'COMPUTED',
             engineResult: result,
             resolvedDate: result.kind === 'ok' ? result.primary : null,
           },

@@ -21,6 +21,8 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('../services/haptics', () => ({
   haptics: {
+    configureIosFallback: vi.fn(),
+    comparison: vi.fn(),
     tapOne: vi.fn(),
     tapTen: vi.fn(),
     confirm: vi.fn(),
@@ -51,7 +53,8 @@ import Settings from './Settings';
 import type { ResolvedDate } from '../utils/types';
 
 const CLEAN_STEALTH = {
-  phase: 'ANCHOR' as const,
+  phase: 'COMPARISON' as const,
+  dominantPart: null,
   anchorValue: 0,
   differenceValue: 0,
   lastAdded: 0,
@@ -63,7 +66,7 @@ const CLEAN_STATE = {
   screen: 'home' as const,
   stealth: CLEAN_STEALTH,
   history: [] as ReturnType<typeof useStore.getState>['history'],
-  settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true },
+  settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true, displayMode: 'fade-out', iosHaptics: true },
 };
 
 const CANCER_DATE: ResolvedDate = {
@@ -145,7 +148,7 @@ describe('Home screen', () => {
 
   it('does not show ntfy warning when ntfyTopic is set', () => {
     useStore.setState({
-      settings: { ntfyTopic: 'my-topic', ntfyEnabled: true, hapticFeedback: true },
+      settings: { ntfyTopic: 'my-topic', ntfyEnabled: true, hapticFeedback: true, displayMode: 'fade-out', iosHaptics: true },
     });
     render(<Home />);
     expect(
@@ -161,7 +164,7 @@ describe('Home screen', () => {
 
   it('routes primary action to stealth when ntfyTopic is configured', () => {
     useStore.setState({
-      settings: { ntfyTopic: 'my-topic', ntfyEnabled: true, hapticFeedback: true },
+      settings: { ntfyTopic: 'my-topic', ntfyEnabled: true, hapticFeedback: true, displayMode: 'fade-out', iosHaptics: true },
     });
     render(<Home />);
     fireEvent.click(screen.getByText('Performance').closest('button')!);
@@ -170,7 +173,7 @@ describe('Home screen', () => {
 
   it('does not show ntfy warning when push notifications are disabled', () => {
     useStore.setState({
-      settings: { ntfyTopic: '', ntfyEnabled: false, hapticFeedback: true },
+      settings: { ntfyTopic: '', ntfyEnabled: false, hapticFeedback: true, displayMode: 'fade-out', iosHaptics: true },
     });
     render(<Home />);
     expect(screen.queryByText(/set up push notifications/i)).not.toBeInTheDocument();
@@ -178,7 +181,7 @@ describe('Home screen', () => {
 
   it('routes primary action to stealth when push notifications are disabled', () => {
     useStore.setState({
-      settings: { ntfyTopic: '', ntfyEnabled: false, hapticFeedback: true },
+      settings: { ntfyTopic: '', ntfyEnabled: false, hapticFeedback: true, displayMode: 'fade-out', iosHaptics: true },
     });
     render(<Home />);
     fireEvent.click(screen.getByText('Performance').closest('button')!);
@@ -240,7 +243,7 @@ describe('History screen', () => {
 describe('Settings screen', () => {
   it('toggles push notifications setting from on to off', () => {
     useStore.setState({
-      settings: { ntfyTopic: 'my-topic', ntfyEnabled: true, hapticFeedback: true },
+      settings: { ntfyTopic: 'my-topic', ntfyEnabled: true, hapticFeedback: true, displayMode: 'fade-out', iosHaptics: true },
     });
     render(<Settings />);
     fireEvent.click(screen.getByLabelText('Toggle push notifications'));
@@ -249,11 +252,29 @@ describe('Settings screen', () => {
 
   it('toggles haptic feedback setting from on to off', () => {
     useStore.setState({
-      settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true },
+      settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true, displayMode: 'fade-out', iosHaptics: true },
     });
     render(<Settings />);
     fireEvent.click(screen.getByLabelText('Toggle haptic feedback'));
     expect(useStore.getState().settings.hapticFeedback).toBe(false);
+  });
+
+  it('toggles experimental iPhone haptics from on to off', () => {
+    useStore.setState({
+      settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true, displayMode: 'fade-out', iosHaptics: true },
+    });
+    render(<Settings />);
+    fireEvent.click(screen.getByLabelText('Toggle experimental iPhone haptics'));
+    expect(useStore.getState().settings.iosHaptics).toBe(false);
+  });
+
+  it('switches display mode to muted black', () => {
+    useStore.setState({
+      settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true, displayMode: 'fade-out', iosHaptics: true },
+    });
+    render(<Settings />);
+    fireEvent.click(screen.getByText('Muted Black'));
+    expect(useStore.getState().settings.displayMode).toBe('muted-black');
   });
 });
 
@@ -264,6 +285,7 @@ describe('ResultPeek screen', () => {
     useStore.setState({
       stealth: {
         phase: 'COMPUTED',
+        dominantPart: 'DAY',
         anchorValue: 24,
         differenceValue: 10,
         lastAdded: 0,

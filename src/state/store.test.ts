@@ -5,7 +5,8 @@ import type { EngineResult, ResolvedDate, Reading } from '../utils/types';
 const INITIAL_STATE = {
   screen: 'home' as const,
   stealth: {
-    phase: 'ANCHOR' as const,
+    phase: 'COMPARISON' as const,
+    dominantPart: null,
     anchorValue: 0,
     differenceValue: 0,
     lastAdded: 0,
@@ -13,7 +14,7 @@ const INITIAL_STATE = {
     resolvedDate: null,
   },
   history: [] as Reading[],
-  settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true },
+  settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true, displayMode: 'fade-out', iosHaptics: true },
 };
 
 beforeEach(() => {
@@ -61,6 +62,16 @@ describe('setScreen', () => {
 
 // ── Stealth: increment ────────────────────────────────────────────────────────
 
+describe('chooseDominantPart', () => {
+  it('stores the selected dominant date part and advances to ANCHOR', () => {
+    useStore.getState().chooseDominantPart('DAY');
+    const stealth = useStore.getState().stealth;
+    expect(stealth.phase).toBe('ANCHOR');
+    expect(stealth.dominantPart).toBe('DAY');
+    expect(stealth.anchorValue).toBe(0);
+  });
+});
+
 describe('incrementAnchor', () => {
   it('adds amount to anchorValue', () => {
     useStore.getState().incrementAnchor(10);
@@ -103,6 +114,7 @@ describe('incrementDifference', () => {
 
 describe('undoLast', () => {
   it('removes lastAdded from anchorValue in ANCHOR phase', () => {
+    useStore.getState().chooseDominantPart('DAY');
     useStore.getState().incrementAnchor(10);
     useStore.getState().incrementAnchor(1);
     useStore.getState().undoLast();
@@ -112,7 +124,7 @@ describe('undoLast', () => {
 
   it('floors anchorValue at 0 in ANCHOR phase', () => {
     useStore.setState({
-      stealth: { ...INITIAL_STATE.stealth, anchorValue: 3, lastAdded: 10 },
+      stealth: { ...INITIAL_STATE.stealth, phase: 'ANCHOR', dominantPart: 'DAY', anchorValue: 3, lastAdded: 10 },
     });
     useStore.getState().undoLast();
     expect(useStore.getState().stealth.anchorValue).toBe(0);
@@ -170,13 +182,14 @@ describe('goBackPhase', () => {
 
   it('resets all stealth state to default from ANCHOR phase', () => {
     useStore.setState({
-      stealth: { ...INITIAL_STATE.stealth, anchorValue: 5, lastAdded: 5 },
+      stealth: { ...INITIAL_STATE.stealth, phase: 'ANCHOR', dominantPart: 'DAY', anchorValue: 5, lastAdded: 5 },
     });
     useStore.getState().goBackPhase();
     const s = useStore.getState().stealth;
     expect(s.phase).toBe('ANCHOR');
     expect(s.anchorValue).toBe(0);
     expect(s.lastAdded).toBe(0);
+    expect(s.dominantPart).toBe('DAY');
   });
 });
 
@@ -187,6 +200,8 @@ describe('resetCurrentPhase', () => {
     useStore.setState({
       stealth: {
         ...INITIAL_STATE.stealth,
+        phase: 'ANCHOR',
+        dominantPart: 'DAY',
         anchorValue: 24,
         lastAdded: 1,
       },
@@ -243,10 +258,10 @@ describe('confirmDifference', () => {
     expect(s.resolvedDate).toEqual(dateJul17);
   });
 
-  it('with ambiguous result: sets phase to RESOLVING, resolvedDate null', () => {
+  it('with ambiguous result: stores the ambiguous payload and leaves resolvedDate null', () => {
     useStore.getState().confirmDifference(ambiguousResult);
     const s = useStore.getState().stealth;
-    expect(s.phase).toBe('RESOLVING');
+    expect(s.phase).toBe('COMPUTED');
     expect(s.engineResult).toEqual(ambiguousResult);
     expect(s.resolvedDate).toBeNull();
   });
@@ -257,7 +272,7 @@ describe('confirmDifference', () => {
 describe('resolveAmbiguous', () => {
   it('sets phase to COMPUTED and sets resolvedDate', () => {
     useStore.setState({
-      stealth: { ...INITIAL_STATE.stealth, phase: 'RESOLVING', engineResult: ambiguousResult },
+      stealth: { ...INITIAL_STATE.stealth, phase: 'COMPUTED', engineResult: ambiguousResult },
     });
     useStore.getState().resolveAmbiguous(dateJul17);
     const s = useStore.getState().stealth;
@@ -329,6 +344,8 @@ describe('updateSettings', () => {
     expect(useStore.getState().settings.ntfyTopic).toBe('my-topic');
     expect(useStore.getState().settings.ntfyEnabled).toBe(true); // unchanged
     expect(useStore.getState().settings.hapticFeedback).toBe(true); // unchanged
+    expect(useStore.getState().settings.displayMode).toBe('fade-out');
+    expect(useStore.getState().settings.iosHaptics).toBe(true);
   });
 
   it('merges ntfyEnabled patch into settings', () => {
@@ -336,6 +353,8 @@ describe('updateSettings', () => {
     expect(useStore.getState().settings.ntfyEnabled).toBe(false);
     expect(useStore.getState().settings.ntfyTopic).toBe(''); // unchanged
     expect(useStore.getState().settings.hapticFeedback).toBe(true); // unchanged
+    expect(useStore.getState().settings.displayMode).toBe('fade-out');
+    expect(useStore.getState().settings.iosHaptics).toBe(true);
   });
 
   it('merges hapticFeedback patch into settings', () => {
@@ -343,10 +362,36 @@ describe('updateSettings', () => {
     expect(useStore.getState().settings.hapticFeedback).toBe(false);
     expect(useStore.getState().settings.ntfyTopic).toBe(''); // unchanged
     expect(useStore.getState().settings.ntfyEnabled).toBe(true); // unchanged
+    expect(useStore.getState().settings.displayMode).toBe('fade-out');
+    expect(useStore.getState().settings.iosHaptics).toBe(true);
+  });
+
+  it('merges display mode patch into settings', () => {
+    useStore.getState().updateSettings({ displayMode: 'muted-black' });
+    expect(useStore.getState().settings.displayMode).toBe('muted-black');
+    expect(useStore.getState().settings.iosHaptics).toBe(true);
+  });
+
+  it('merges iOS haptics patch into settings', () => {
+    useStore.getState().updateSettings({ iosHaptics: false });
+    expect(useStore.getState().settings.iosHaptics).toBe(false);
+    expect(useStore.getState().settings.displayMode).toBe('fade-out');
   });
 
   it('merges multiple fields at once', () => {
-    useStore.getState().updateSettings({ ntfyTopic: 'test', ntfyEnabled: false, hapticFeedback: false });
-    expect(useStore.getState().settings).toEqual({ ntfyTopic: 'test', ntfyEnabled: false, hapticFeedback: false });
+    useStore.getState().updateSettings({
+      ntfyTopic: 'test',
+      ntfyEnabled: false,
+      hapticFeedback: false,
+      displayMode: 'muted-black',
+      iosHaptics: false,
+    });
+    expect(useStore.getState().settings).toEqual({
+      ntfyTopic: 'test',
+      ntfyEnabled: false,
+      hapticFeedback: false,
+      displayMode: 'muted-black',
+      iosHaptics: false,
+    });
   });
 });

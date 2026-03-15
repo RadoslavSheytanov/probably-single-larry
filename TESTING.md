@@ -85,7 +85,7 @@ When a test fails, the output includes:
 
 The following require manual testing on a real device:
 
-- **Touch gesture simulation** — long-press, double-tap, three-finger tap, and swipe gestures on `StealthInput.tsx` cannot be reliably simulated with `fireEvent` in jsdom. Test manually on iPhone and Android.
+- **Touch gesture simulation** — long-press, two-finger swipe, three-finger tap, and directional swipe gestures on `StealthInput.tsx` cannot be reliably simulated with `fireEvent` in jsdom. Test manually on iPhone and Android.
 - **Framer Motion animations** — all animation props (`initial`, `animate`, `exit`, `transition`, `whileTap`) are stripped by the framer-motion mock in test files. Verify animations visually in the browser.
 - **Wake Lock API** — mocked in tests. Verify the screen stays on during a performance on a real device.
 - **ntfy push delivery** — unit tests verify the fetch call is made with correct parameters. Verify end-to-end delivery to a real watch/phone in a full integration test environment.

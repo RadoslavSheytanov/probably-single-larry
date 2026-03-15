@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useStore } from './state/store';
 import { validateStoredLicense, clearLicense } from './services/license';
+import { haptics } from './services/haptics';
 import LicenseGate from './screens/LicenseGate';
 import Home from './screens/Home';
 import StealthInput from './screens/StealthInput';
@@ -15,6 +16,7 @@ const REVIEW_MODE_ENABLED = import.meta.env.VITE_REVIEW_MODE === 'true';
 
 export default function App() {
   const screen = useStore((s) => s.screen);
+  const iosHaptics = useStore((s) => s.settings.iosHaptics);
   const [authState, setAuthState] = useState<AuthState>('checking');
 
   useEffect(() => {
@@ -27,6 +29,10 @@ export default function App() {
       setAuthState(valid ? 'active' : 'needs-auth');
     });
   }, []);
+
+  useEffect(() => {
+    haptics.configureIosFallback(iosHaptics);
+  }, [iosHaptics]);
 
   function handleDeactivate() {
     clearLicense();

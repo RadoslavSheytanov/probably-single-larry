@@ -5,7 +5,7 @@ interface Props {
   phase: Phase;
 }
 
-const PHASES: Phase[] = ['ANCHOR', 'DIFFERENCE', 'COMPUTED', 'RESOLVING'];
+const PHASES: Phase[] = ['COMPARISON', 'ANCHOR', 'DIFFERENCE', 'COMPUTED'];
 
 export default function PhaseIndicator({ phase }: Props) {
   const activeIndex = PHASES.indexOf(phase);

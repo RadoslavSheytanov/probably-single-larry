@@ -173,6 +173,11 @@ export default function Instructions() {
             bottom tell you which phase you are in.
           </Body>
           <Body>
+            Before you enter any totals, ask the spectator:
+            "Which number is bigger, the day you were born or the month?"
+            Tap the top half for day, or the bottom half for month.
+          </Body>
+          <Body>
             Enter the total from Step 2 first, then the total from Step 3.
           </Body>
 
@@ -184,15 +189,14 @@ export default function Instructions() {
 
           <div className="mt-2 rounded-[24px] border border-white/[7%] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))] px-4 py-3">
             <p className="font-ui-medium mb-1 text-[10px] uppercase tracking-[4px] text-white/20">Correcting</p>
-            <GestureRow gesture="Double tap" action="Undo last tap" />
             <GestureRow gesture="Three fingers" action="Reset to zero" />
-            <GestureRow gesture="Swipe left" action="Go back to previous number" />
+            <GestureRow gesture="Swipe left" action="Restart the number entry" />
           </div>
 
           <div className="mt-2 rounded-[24px] border border-white/[7%] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))] px-4 py-3">
             <p className="font-ui-medium mb-1 text-[10px] uppercase tracking-[4px] text-white/20">Confirming</p>
             <GestureRow gesture="Long press" action="Confirm and move to next phase" />
-            <GestureRow gesture="Swipe down" action="Exit performance mode" />
+            <GestureRow gesture="Two-finger swipe down" action="Exit performance mode" />
           </div>
 
           <Body>
@@ -204,17 +208,13 @@ export default function Instructions() {
         {/* 04 — Ambiguous */}
         <Section number="04" title="When Two Dates Appear">
           <Body>
-            Some birthdays share the same two numbers as another birthday.
-            When this happens the screen shows both possibilities and vibrates twice.
+            Some birthdays share the same two totals as another birthday.
+            That ambiguity is handled before you begin by asking whether the day
+            or the month is the larger number.
           </Body>
           <Body>
-            The earlier date is always on the top half.
-            The later date is always on the bottom half.
-          </Body>
-          <Body>
-            Ask a natural follow-up question such as "Is your birthday in
-            the first half of the year or the second?" then tap the correct half.
-            The result is sent to your watch.
+            Once you have stored that answer, the app resolves those edge cases
+            automatically after you enter the anchor and difference totals.
           </Body>
         </Section>
 

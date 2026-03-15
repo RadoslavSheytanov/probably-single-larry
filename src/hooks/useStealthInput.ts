@@ -2,13 +2,14 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useStore } from '../state/store';
 import { haptics } from '../services/haptics';
 import { compute } from '../engine/singularis';
-import { LONG_PRESS_MS, DOUBLE_TAP_MS } from '../utils/constants';
-import type { EngineResult, Phase } from '../utils/types';
+import { LONG_PRESS_MS } from '../utils/constants';
+import type { DominantDatePart, EngineResult, Phase } from '../utils/types';
 
 type OkResult = Extract<EngineResult, { kind: 'ok' }>;
 type AmbiguousResult = Extract<EngineResult, { kind: 'ambiguous' }>;
 
 interface Options {
+  onComparisonChoice?: (part: DominantDatePart) => void;
   onAnchorTooLow?: () => void;
   onError?: (reason: string) => void;
   onResult?: (result: OkResult) => void;
@@ -28,8 +29,6 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
 
   // Refs for gesture tracking (avoids stale closures in native event handlers)
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastTapTime = useRef<number>(0);
-  const lastTapCount = useRef<number>(0);
   const touchStartY = useRef<number>(0);
   const touchStartX = useRef<number>(0);
   const swipeStartTime = useRef<number>(0);
@@ -49,6 +48,7 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
 
   // Stable refs for opts callbacks — prevents opts from being a useEffect dependency
   // (which would cause touch listeners to detach/reattach on every render)
+  const onComparisonChoiceRef = useRef(opts.onComparisonChoice);
   const onAnchorTooLowRef = useRef(opts.onAnchorTooLow);
   const onErrorRef = useRef(opts.onError);
   const onResultRef = useRef(opts.onResult);
@@ -58,6 +58,7 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
   const onTapRef = useRef(opts.onTap);
 
   // Update refs every render so callbacks are always current
+  onComparisonChoiceRef.current = opts.onComparisonChoice;
   onAnchorTooLowRef.current = opts.onAnchorTooLow;
   onErrorRef.current = opts.onError;
   onResultRef.current = opts.onResult;
@@ -73,6 +74,14 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
 
   const handleTap = useCallback((isTopZone: boolean) => {
     const currentPhase = phaseRef.current;
+    if (currentPhase === 'COMPARISON') {
+      const part: DominantDatePart = isTopZone ? 'DAY' : 'MONTH';
+      store.chooseDominantPart(part);
+      h(() => haptics.comparison());
+      onComparisonChoiceRef.current?.(part);
+      return;
+    }
+
     if (currentPhase !== 'ANCHOR' && currentPhase !== 'DIFFERENCE') return;
 
     const amount = isTopZone ? 10 : 1;
@@ -166,16 +175,6 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
         return;
       }
 
-      // Double-tap detection
-      const now = Date.now();
-      const gap = now - lastTapTime.current;
-      if (gap < DOUBLE_TAP_MS) {
-        lastTapCount.current++;
-      } else {
-        lastTapCount.current = 1;
-      }
-      lastTapTime.current = now;
-
       // Long press timer
       longPressTimer.current = setTimeout(() => {
         didLongPress.current = true;
@@ -192,20 +191,20 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
       const deltaX = touch.clientX - touchStartX.current;
       const elapsed = Date.now() - swipeStartTime.current;
 
-      const inResolving = phaseRef.current === 'RESOLVING';
+      const currentPhase = phaseRef.current;
 
-      // Swipe down to exit — blocked in RESOLVING to prevent accidental abort
-      if (deltaY > 80 && Math.abs(deltaX) < 60 && elapsed < 500) {
-        if (!inResolving) {
-          hapticRef.current && haptics.exit();
-          onExitRef.current?.();
-        }
+      // Two-finger swipe down exits performance mode.
+      if (fingerCount.current === 2 && deltaY > 80 && Math.abs(deltaX) < 80 && elapsed < 500) {
+        hapticRef.current && haptics.exit();
+        onExitRef.current?.();
         return;
       }
 
-      // Swipe left to go back — blocked in RESOLVING to prevent accidental reset
+      // Swipe left resets numeric input while preserving the day/month choice.
       if (-deltaX > 80 && Math.abs(deltaY) < 60 && elapsed < 500) {
-        if (!inResolving) handleGoBack();
+        if (currentPhase === 'ANCHOR' || currentPhase === 'DIFFERENCE') {
+          handleGoBack();
+        }
         return;
       }
 
@@ -213,14 +212,9 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
 
       // Three-finger tap = reset
       if (fingerCount.current >= 3) {
-        handleReset();
-        return;
-      }
-
-      // Double-tap = undo
-      if (lastTapCount.current >= 2) {
-        lastTapCount.current = 0;
-        handleUndo();
+        if (currentPhase === 'ANCHOR' || currentPhase === 'DIFFERENCE') {
+          handleReset();
+        }
         return;
       }
 
@@ -265,6 +259,20 @@ export function useStealthInput(containerRef: React.RefObject<HTMLElement | null
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       const currentPhase = phaseRef.current;
+      if (currentPhase === 'COMPARISON') {
+        switch (e.key) {
+          case 'ArrowUp':
+            e.preventDefault();
+            handleTap(true);
+            break;
+          case 'ArrowDown':
+            e.preventDefault();
+            handleTap(false);
+            break;
+        }
+        return;
+      }
+
       if (currentPhase !== 'ANCHOR' && currentPhase !== 'DIFFERENCE') return;
 
       switch (e.key) {

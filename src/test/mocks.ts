@@ -47,7 +47,8 @@ export function resetStore() {
   useStore.setState({
     screen: 'home',
     stealth: {
-      phase: 'ANCHOR',
+      phase: 'COMPARISON',
+      dominantPart: null,
       anchorValue: 0,
       differenceValue: 0,
       lastAdded: 0,
@@ -55,6 +56,6 @@ export function resetStore() {
       resolvedDate: null,
     },
     history: [],
-    settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true },
+    settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true, displayMode: 'fade-out', iosHaptics: true },
   });
 }

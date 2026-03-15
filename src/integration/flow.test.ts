@@ -9,6 +9,8 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('../services/haptics', () => ({
   haptics: {
+    configureIosFallback: vi.fn(),
+    comparison: vi.fn(),
     tapOne: vi.fn(), tapTen: vi.fn(), confirm: vi.fn(), error: vi.fn(),
     result: vi.fn(), ambiguous: vi.fn(), undo: vi.fn(), back: vi.fn(),
     exit: vi.fn(), resolved: vi.fn(),
@@ -25,7 +27,8 @@ import { useStore } from '../state/store';
 import { compute } from '../engine/singularis';
 
 const CLEAN_STEALTH = {
-  phase: 'ANCHOR' as const,
+  phase: 'COMPARISON' as const,
+  dominantPart: null,
   anchorValue: 0,
   differenceValue: 0,
   lastAdded: 0,
@@ -38,7 +41,7 @@ function resetStore() {
     screen: 'home',
     stealth: { ...CLEAN_STEALTH },
     history: [],
-    settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true },
+    settings: { ntfyTopic: '', ntfyEnabled: true, hapticFeedback: true, displayMode: 'fade-out', iosHaptics: true },
   });
 }
 
@@ -52,6 +55,8 @@ describe('Flow 1: Complete unambiguous performance (A=24, D=10 → July 17, Canc
   it('reaches COMPUTED with correct resolvedDate', () => {
     const { incrementAnchor, confirmAnchor, incrementDifference, confirmDifference } =
       useStore.getState();
+
+    useStore.getState().chooseDominantPart('DAY');
 
     // Build anchorValue = 24
     incrementAnchor(10);
@@ -86,6 +91,7 @@ describe('Flow 1: Complete unambiguous performance (A=24, D=10 → July 17, Canc
 describe('Flow 2: Undo during ANCHOR', () => {
   it('removes the lastAdded amount on undoLast', () => {
     const { incrementAnchor, undoLast } = useStore.getState();
+    useStore.getState().chooseDominantPart('DAY');
 
     incrementAnchor(10);
     expect(useStore.getState().stealth.anchorValue).toBe(10);
@@ -101,6 +107,7 @@ describe('Flow 2: Undo during ANCHOR', () => {
   });
 
   it('does not go below zero on undo', () => {
+    useStore.getState().chooseDominantPart('DAY');
     useStore.getState().incrementAnchor(1);
     useStore.getState().undoLast();
     useStore.getState().undoLast(); // second undo when lastAdded=0
@@ -113,7 +120,7 @@ describe('Flow 2: Undo during ANCHOR', () => {
 describe('Flow 3: Three-finger reset during DIFFERENCE', () => {
   it('resets differenceValue to 0 but keeps phase as DIFFERENCE', () => {
     useStore.setState({
-      stealth: { ...CLEAN_STEALTH, anchorValue: 24 },
+      stealth: { ...CLEAN_STEALTH, phase: 'ANCHOR', dominantPart: 'DAY', anchorValue: 24 },
     });
     useStore.getState().confirmAnchor();
     useStore.getState().incrementDifference(10);
@@ -134,7 +141,7 @@ describe('Flow 3: Three-finger reset during DIFFERENCE', () => {
 describe('Flow 4: Go back from DIFFERENCE to ANCHOR', () => {
   it('resets to ANCHOR with anchorValue=0 via goBackPhase', () => {
     useStore.setState({
-      stealth: { ...CLEAN_STEALTH, anchorValue: 24 },
+      stealth: { ...CLEAN_STEALTH, phase: 'ANCHOR', dominantPart: 'DAY', anchorValue: 24 },
     });
     useStore.getState().confirmAnchor();
     expect(useStore.getState().stealth.phase).toBe('DIFFERENCE');
@@ -144,6 +151,7 @@ describe('Flow 4: Go back from DIFFERENCE to ANCHOR', () => {
 
     const stealth = useStore.getState().stealth;
     expect(stealth.phase).toBe('ANCHOR');
+    expect(stealth.dominantPart).toBe('DAY');
     expect(stealth.anchorValue).toBe(0);
     expect(stealth.differenceValue).toBe(0);
   });
@@ -152,11 +160,11 @@ describe('Flow 4: Go back from DIFFERENCE to ANCHOR', () => {
 // ─── Flow 5: Ambiguous result flow ───────────────────────────────────────────
 
 describe('Flow 5: Ambiguous result flow', () => {
-  it('enters RESOLVING phase and resolves to COMPUTED', () => {
+  it('stores the ambiguous result and can resolve it with the chosen dominant part', () => {
     // Find an ambiguous pair: A=13, D=3 → smaller=5, larger=8 → both ≤12 → ambiguous
     // smaller=5 (month), larger=8 (day): May 8 valid; larger=8 (month), smaller=5 (day): Aug 5 valid
     useStore.setState({
-      stealth: { ...CLEAN_STEALTH, anchorValue: 13 },
+      stealth: { ...CLEAN_STEALTH, phase: 'ANCHOR', dominantPart: 'DAY', anchorValue: 13 },
     });
     useStore.getState().confirmAnchor();
 
@@ -170,7 +178,7 @@ describe('Flow 5: Ambiguous result flow', () => {
     if (result.kind !== 'ambiguous') return;
 
     useStore.getState().confirmDifference(result);
-    expect(useStore.getState().stealth.phase).toBe('RESOLVING');
+    expect(useStore.getState().stealth.phase).toBe('COMPUTED');
     expect(useStore.getState().stealth.resolvedDate).toBeNull();
 
     useStore.getState().resolveAmbiguous(result.primary);
@@ -206,7 +214,7 @@ describe('Flow 6: Error state handling', () => {
 
   it('store phase stays DIFFERENCE after confirmAnchor when no confirmDifference called on error path', () => {
     useStore.setState({
-      stealth: { ...CLEAN_STEALTH, anchorValue: 10 },
+      stealth: { ...CLEAN_STEALTH, phase: 'ANCHOR', dominantPart: 'DAY', anchorValue: 10 },
     });
     useStore.getState().confirmAnchor();
     useStore.getState().incrementDifference(1);
